@@ -36,6 +36,9 @@ public class User {
     private String otp;
     private LocalDateTime otpExpiry;
 
+    private int otpAttempts;
+    private LocalDateTime otpLastSent;
+
     // PROFILE DETAILS
     private String address;
     private String course;

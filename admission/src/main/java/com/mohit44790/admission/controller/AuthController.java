@@ -54,9 +54,17 @@ public class AuthController {
         user.setPassword(encoder.encode(req.getPassword()));
         user.setEmailVerified(false);
 
+        // OTP resend cooldown (60 seconds)
+        if (user.getOtpLastSent() != null &&
+                user.getOtpLastSent().isAfter(LocalDateTime.now().minusSeconds(60))) {
+            throw new RuntimeException("Please wait before requesting OTP again");
+        }
+
         String otp = otpUtil.generateOtp();
         user.setOtp(otp);
         user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+        user.setOtpAttempts(0);
+        user.setOtpLastSent(LocalDateTime.now());
 
         repo.save(user);
         emailService.sendOtp(user.getEmail(), otp);
@@ -71,6 +79,10 @@ public class AuthController {
         User user = repo.findByEmail(data.get("email"))
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        if (user.getOtpAttempts() >= 3) {
+            throw new RuntimeException("Too many wrong OTP attempts. Try again later");
+        }
+
         if (user.getOtp().equals(data.get("otp")) &&
                 user.getOtpExpiry().isAfter(LocalDateTime.now())) {
 
@@ -80,6 +92,29 @@ public class AuthController {
             return "OTP Verified";
         }
         throw new RuntimeException("Invalid or expired OTP");
+    }
+//resend otp
+    @PostMapping("/resend-otp")
+    public String resendOtp(@RequestBody Map<String, String> data) {
+
+        User user = repo.findByEmail(data.get("email"))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getOtpLastSent() != null &&
+                user.getOtpLastSent().isAfter(LocalDateTime.now().minusSeconds(60))) {
+            throw new RuntimeException("Please wait 60 seconds before resending OTP");
+        }
+
+        String otp = otpUtil.generateOtp();
+        user.setOtp(otp);
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+        user.setOtpAttempts(0);
+        user.setOtpLastSent(LocalDateTime.now());
+
+        repo.save(user);
+        emailService.sendOtp(user.getEmail(), otp);
+
+        return "OTP resent successfully";
     }
 
     // LOGIN
