@@ -79,21 +79,32 @@ public class AuthController {
         User user = repo.findByEmail(data.get("email"))
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Check attempts first
         if (user.getOtpAttempts() >= 3) {
             throw new RuntimeException("Too many wrong OTP attempts. Try again later");
         }
 
+        // OTP correct & not expired
         if (user.getOtp().equals(data.get("otp")) &&
                 user.getOtpExpiry().isAfter(LocalDateTime.now())) {
 
             user.setEmailVerified(true);
             user.setOtp(null);
+            user.setOtpAttempts(0); // reset
             repo.save(user);
             return "OTP Verified";
         }
-        throw new RuntimeException("Invalid or expired OTP");
+
+        // ❗ WRONG OTP CASE
+        user.setOtpAttempts(user.getOtpAttempts() + 1);
+        repo.save(user);
+
+        throw new RuntimeException(
+                "Invalid OTP. Attempts left: " + (3 - user.getOtpAttempts())
+        );
     }
-//resend otp
+
+    //resend otp
     @PostMapping("/resend-otp")
     public String resendOtp(@RequestBody Map<String, String> data) {
 
