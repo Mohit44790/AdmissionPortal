@@ -1,0 +1,101 @@
+package com.mohit44790.admission.controller;
+
+import com.mohit44790.admission.dto.SignupRequest;
+import com.mohit44790.admission.entity.User;
+import com.mohit44790.admission.repository.UserRepository;
+import com.mohit44790.admission.security.JwtUtil;
+import com.mohit44790.admission.security.OtpUtil;
+import com.mohit44790.admission.service.EmailService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
+@CrossOrigin
+public class AuthController {
+
+    private final UserRepository repo;
+    private final EmailService emailService;
+    private final OtpUtil otpUtil;
+    private final JwtUtil jwtUtil;
+    private final PasswordEncoder encoder;
+
+    public AuthController(UserRepository repo,
+                          EmailService emailService,
+                          OtpUtil otpUtil,
+                          JwtUtil jwtUtil,
+                          PasswordEncoder encoder) {
+        this.repo = repo;
+        this.emailService = emailService;
+        this.otpUtil = otpUtil;
+        this.jwtUtil = jwtUtil;
+        this.encoder = encoder;
+    }
+
+    // SIGNUP
+    @PostMapping("/signup")
+    public String signup(@RequestBody SignupRequest req) {
+
+        if (!req.getPassword().equals(req.getConfirmPassword())) {
+            throw new RuntimeException("Password & Confirm Password not match");
+        }
+
+        if (repo.existsByEmail(req.getEmail())) {
+            throw new RuntimeException("Email already registered");
+        }
+
+        User user = new User();
+        user.setName(req.getName());
+        user.setEmail(req.getEmail());
+        user.setMobile(req.getMobile());
+        user.setPassword(encoder.encode(req.getPassword()));
+        user.setEmailVerified(false);
+
+        String otp = otpUtil.generateOtp();
+        user.setOtp(otp);
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+
+        repo.save(user);
+        emailService.sendOtp(user.getEmail(), otp);
+
+        return "OTP sent to email";
+    }
+
+    // VERIFY OTP
+    @PostMapping("/verify-otp")
+    public String verifyOtp(@RequestBody Map<String, String> data) {
+
+        User user = repo.findByEmail(data.get("email"))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getOtp().equals(data.get("otp")) &&
+                user.getOtpExpiry().isAfter(LocalDateTime.now())) {
+
+            user.setEmailVerified(true);
+            user.setOtp(null);
+            repo.save(user);
+            return "OTP Verified";
+        }
+        throw new RuntimeException("Invalid or expired OTP");
+    }
+
+    // LOGIN
+    @PostMapping("/login")
+    public Map<String, String> login(@RequestBody Map<String, String> data) {
+
+        User user = repo.findByEmail(data.get("email"))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.isEmailVerified())
+            throw new RuntimeException("Email not verified");
+
+        if (!encoder.matches(data.get("password"), user.getPassword()))
+            throw new RuntimeException("Invalid credentials");
+
+        String token = jwtUtil.generateToken(user.getEmail());
+        return Map.of("token", token);
+    }
+}
