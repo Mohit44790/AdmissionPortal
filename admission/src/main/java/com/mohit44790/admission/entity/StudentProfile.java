@@ -6,8 +6,7 @@ import jakarta.persistence.*;
 @Entity
 public class StudentProfile {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue
     private Long id;
 
     @OneToOne
@@ -15,9 +14,13 @@ public class StudentProfile {
 
     private String name;
     private String alternateMobile;
+    private String alternateEmail;
     private String address;
-    private boolean profileCompleted;
+    private String fatherName;
+    private String motherName;
+    private String category;
 
-    // getters & setters
+    private boolean profileCompleted;
 }
+
 
