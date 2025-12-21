@@ -1,6 +1,6 @@
 package com.mohit44790.admission.util;
 
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,4 +36,3 @@ public class FileUploadUtil {
         return filePath.toString();
     }
 }
-
