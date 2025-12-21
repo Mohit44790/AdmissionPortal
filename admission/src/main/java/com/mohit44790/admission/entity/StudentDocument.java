@@ -11,10 +11,15 @@ public class StudentDocument {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String documentType;
+    @Enumerated(EnumType.STRING)
+    private DocumentType documentType;
+
     private String filePath;
+
+    private boolean verified = false;
 
     @ManyToOne
     @JoinColumn(name = "student_profile_id")
     private StudentProfile studentProfile;
 }
+

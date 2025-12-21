@@ -15,6 +15,7 @@ public class AdmissionApplication {
     @ManyToOne
     private StudentProfile studentProfile;
 
+
     private String programLevel;
     private String courseName;
     private String collegeName;

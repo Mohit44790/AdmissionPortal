@@ -11,28 +11,39 @@ public class StudentProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ✅ Logged-in user mapping
+    // 🔐 mapping with user
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // -------- BASIC DETAILS (STEP BY STEP) --------
+    // ---------- STEP 1 : PERSONAL ----------
     private String fullName;
     private String alternatePhone;
     private String alternateEmail;
+    private String gender;
+    private String dob;
 
-    // -------- ADDRESS --------
-    private String addressLine;
-    private String city;
-    private String state;
-    private String pincode;
-
-    // -------- FAMILY DETAILS --------
+    // ---------- STEP 2 : FAMILY ----------
     private String fatherName;
     private String motherName;
     private String familyIncome;
 
-    // -------- CATEGORY --------
+    // ---------- STEP 3 : BANK ----------
+    private String bankName;
+    private String accountNumber;
+    private String ifsc;
+
+    // ---------- STEP 4 : CATEGORY ----------
     private String category;
     private String caste;
+    private String quota;
+
+    // ---------- STEP 5 : OTHER ----------
+    private String nationality;
+    private String religion;
+    private String disability;
+
+    // ---------- STEP TRACKING ----------
+    private int completedStep = 0;
 }
+
