@@ -21,7 +21,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private boolean verified = true;
+    private boolean verified;
 
     // getters & setters
 }
