@@ -1,4 +1,4 @@
 package com.mohit44790.admission.entity;
 
-public class User {
+public class College {
 }

@@ -1,4 +1,7 @@
 package com.mohit44790.admission.entity;
 
-public class User {
+public enum Role {
+    ADMIN,
+    STUDENT
 }
+

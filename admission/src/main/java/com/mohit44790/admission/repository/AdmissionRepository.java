@@ -1,4 +1,4 @@
 package com.mohit44790.admission.repository;
 
-public class UserRepository {
+public class AdmissionRepository {
 }

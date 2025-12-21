@@ -1,4 +1,4 @@
 package com.mohit44790.admission.controller;
 
-public class AuthController {
+public class AdminController {
 }
