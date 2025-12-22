@@ -13,7 +13,11 @@ public class Course {
 
     private String courseName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "program_id")
     private Program program;
+
+    @ManyToOne
+    @JoinColumn(name = "college_id")
+    private College college;
 }
