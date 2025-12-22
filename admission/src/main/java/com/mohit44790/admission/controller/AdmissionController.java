@@ -8,8 +8,9 @@ import com.mohit44790.admission.repository.StudentDocumentRepository;
 import com.mohit44790.admission.repository.UserRepository;
 import com.mohit44790.admission.service.StudentProfileService;
 import com.mohit44790.admission.util.FileUploadUtil;
-import org.springframework.core.io.Resource;
+import com.mohit44790.admission.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -35,20 +36,22 @@ public class AdmissionController {
 
     @Autowired
     private FileUploadUtil fileUtil;
+
     @Autowired
     private StudentDocumentRepository docRepo;
 
+    // 🔐 Get or create profile
     private StudentProfile getProfile(Principal principal) {
-        User u = userRepo.findByEmail(principal.getName())
+        User user = userRepo.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return service.getOrCreate(u);
+        return service.getOrCreate(user);
     }
 
-    // 📤 UPLOAD DOCUMENT
+    // 📤 Upload document
     @PostMapping("/upload-document")
-    public String uploadDocument(@RequestParam MultipartFile file,
-                                 @RequestParam DocumentType type,
-                                 Principal principal) throws Exception {
+    public ResponseEntity<String> uploadDocument(@RequestParam MultipartFile file,
+                                                 @RequestParam DocumentType type,
+                                                 Principal principal) throws Exception {
 
         StudentProfile profile = getProfile(principal);
 
@@ -59,43 +62,37 @@ public class AdmissionController {
         String path = fileUtil.saveFile(file);
         service.saveDocument(profile, type, path);
 
-        return type + " uploaded successfully";
+        return ResponseEntity.ok(type + " uploaded successfully");
     }
 
-    // 📄 GET ALL DOCUMENTS
+    // 📄 Get all documents of logged-in student
     @GetMapping("/documents")
     public List<StudentDocument> documents(Principal principal) {
         StudentProfile profile = getProfile(principal);
         return service.getDocuments(profile);
     }
 
+    // 👁️ View document (ADMIN or OWNER only)
     @GetMapping("/view-document/{id}")
-    public ResponseEntity<Resource> viewDocument(@PathVariable Long id,
-                                                 Principal principal) throws Exception {
+    public ResponseEntity<Resource> viewDocument(@PathVariable Long id) throws Exception {
 
         StudentDocument doc = docRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Document not found"));
 
-        User loggedInUser = userRepo.findByEmail(principal.getName())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        // 🔒 Authorization check
+        if (!SecurityUtil.isAdmin() &&
+                !doc.getStudentProfile()
+                        .getUser()
+                        .getEmail()
+                        .equals(SecurityUtil.getCurrentUserEmail())) {
 
-        // ✅ ALLOW IF:
-        // 1️⃣ Logged-in user is ADMIN
-        // 2️⃣ OR document belongs to logged-in student
-        boolean isAdmin = loggedInUser.getRole().name().equals("ADMIN");
-        boolean isOwner = doc.getStudentProfile()
-                .getUser()
-                .getEmail()
-                .equals(loggedInUser.getEmail());
-
-        if (!isAdmin && !isOwner) {
             throw new RuntimeException("Unauthorized access");
         }
 
         Path path = Paths.get(doc.getFilePath()).normalize();
         Resource resource = new UrlResource(path.toUri());
 
-        if (!resource.exists()) {
+        if (!resource.exists() || !resource.isReadable()) {
             throw new RuntimeException("File not found");
         }
 
@@ -107,10 +104,7 @@ public class AdmissionController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "inline; filename=\"" + path.getFileName().toString() + "\"")
+                        "inline; filename=\"" + path.getFileName() + "\"")
                 .body(resource);
     }
-
-
 }
-
