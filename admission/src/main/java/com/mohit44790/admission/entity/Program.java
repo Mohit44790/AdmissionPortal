@@ -11,7 +11,8 @@ public class Program {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 10, 12, UG, PG
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
-    private String level;
+    private ProgramLevel level;
 }
+
