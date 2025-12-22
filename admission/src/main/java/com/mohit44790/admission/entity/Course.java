@@ -11,13 +11,13 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String courseName;
 
-    @ManyToOne
-    @JoinColumn(name = "program_id")
+    @ManyToOne(optional = false)
     private Program program;
 
-    @ManyToOne
-    @JoinColumn(name = "college_id")
+    @ManyToOne(optional = false)
     private College college;
 }
+

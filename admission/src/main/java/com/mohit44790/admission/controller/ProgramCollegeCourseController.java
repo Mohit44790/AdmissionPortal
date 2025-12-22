@@ -3,7 +3,7 @@ package com.mohit44790.admission.controller;
 import com.mohit44790.admission.entity.College;
 import com.mohit44790.admission.entity.Course;
 import com.mohit44790.admission.entity.Program;
-import com.mohit44790.admission.service.AdmissionMasterService;
+import com.mohit44790.admission.service.ProgramCollegeCourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,39 +14,40 @@ import java.util.List;
 public class ProgramCollegeCourseController {
 
     @Autowired
-    private AdmissionMasterService service;
+    private ProgramCollegeCourseService service;
 
-    // ✅ PROGRAMS
+    // ======== STUDENT APIs ========
+
     @GetMapping("/programs")
     public List<Program> programs() {
         return service.getPrograms();
     }
 
-    // ✅ COLLEGES
     @GetMapping("/colleges")
     public List<College> colleges() {
         return service.getColleges();
     }
 
-    // ✅ COURSES (Program + College)
+    // Student selects Program + College
     @GetMapping("/courses")
     public List<Course> courses(@RequestParam String level,
                                 @RequestParam Long collegeId) {
         return service.getCourses(level, collegeId);
     }
 
-    // 🔐 ADMIN APIs
-    @PostMapping("/program")
+    // ======== ADMIN APIs ========
+
+    @PostMapping("/admin/program")
     public Program addProgram(@RequestBody Program p) {
         return service.saveProgram(p);
     }
 
-    @PostMapping("/college")
+    @PostMapping("/admin/college")
     public College addCollege(@RequestBody College c) {
         return service.saveCollege(c);
     }
 
-    @PostMapping("/course")
+    @PostMapping("/admin/course")
     public Course addCourse(@RequestBody Course c) {
         return service.saveCourse(c);
     }

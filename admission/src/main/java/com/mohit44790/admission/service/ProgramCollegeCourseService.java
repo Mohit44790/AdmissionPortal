@@ -12,33 +12,29 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class AdmissionMasterService {
+public class ProgramCollegeCourseService {
 
     @Autowired
     private ProgramRepository programRepo;
-
     @Autowired
     private CourseRepository courseRepo;
-
     @Autowired
     private CollegeRepository collegeRepo;
 
-    // 🔹 Programs
+    // ---------- STUDENT APIs ----------
     public List<Program> getPrograms() {
         return programRepo.findAll();
     }
 
-    // 🔹 Colleges
     public List<College> getColleges() {
         return collegeRepo.findAll();
     }
 
-    // 🔹 Courses (Program + College)
     public List<Course> getCourses(String level, Long collegeId) {
         return courseRepo.findByProgram_LevelAndCollege_Id(level, collegeId);
     }
 
-    // 🔐 ADMIN USE
+    // ---------- ADMIN APIs ----------
     public Program saveProgram(Program p) {
         return programRepo.save(p);
     }
@@ -48,6 +44,17 @@ public class AdmissionMasterService {
     }
 
     public Course saveCourse(Course c) {
+
+        // safety validation
+        Program p = programRepo.findById(c.getProgram().getId())
+                .orElseThrow(() -> new RuntimeException("Invalid Program"));
+
+        College clg = collegeRepo.findById(c.getCollege().getId())
+                .orElseThrow(() -> new RuntimeException("Invalid College"));
+
+        c.setProgram(p);
+        c.setCollege(clg);
+
         return courseRepo.save(c);
     }
 }
