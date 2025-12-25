@@ -6,5 +6,5 @@ public enum ProgramLevel {
     DIPLOMA,
     UG,
     PG,
-    GRADUATE
+        GRADUATE
 }
