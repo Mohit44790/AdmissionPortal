@@ -15,9 +15,12 @@ public class Course {
     private String courseName;
 
     @ManyToOne(optional = false)
+    @JoinColumn(name = "program_id")
     private Program program;
 
     @ManyToOne(optional = false)
+    @JoinColumn(name = "college_id")
     private College college;
 }
+
 

@@ -16,10 +16,10 @@ import java.util.List;
 public class ProgramCollegeCourseService {
 
     @Autowired private ProgramRepository programRepo;
-    @Autowired private CourseRepository courseRepo;
     @Autowired private CollegeRepository collegeRepo;
+    @Autowired private CourseRepository courseRepo;
 
-    // ---------------- STUDENT ----------------
+    // ================= STUDENT =================
 
     public List<Program> getPrograms() {
         return programRepo.findAll();
@@ -29,17 +29,18 @@ public class ProgramCollegeCourseService {
         return collegeRepo.findAll();
     }
 
-    // UG -> all UG courses (all colleges)
+    // Student selects UG → all UG courses in all colleges
     public List<Course> getCoursesByProgram(ProgramLevel level) {
         return courseRepo.findByProgram_Level(level);
     }
 
-    // UG + College
-    public List<Course> getCoursesByProgramAndCollege(ProgramLevel level, Long collegeId) {
+    // Student selects UG + College
+    public List<Course> getCoursesByProgramAndCollege(
+            ProgramLevel level, Long collegeId) {
         return courseRepo.findByProgram_LevelAndCollege_Id(level, collegeId);
     }
 
-    // ---------------- ADMIN ----------------
+    // ================= ADMIN =================
 
     // PROGRAM
     public Program addProgram(Program p) {
@@ -75,23 +76,33 @@ public class ProgramCollegeCourseService {
 
     // COURSE
     public Course addCourse(Course c) {
-        Program p = programRepo.findById(c.getProgram().getId())
+
+        Program program = programRepo.findById(c.getProgram().getId())
                 .orElseThrow(() -> new RuntimeException("Invalid Program"));
-        College clg = collegeRepo.findById(c.getCollege().getId())
+
+        College college = collegeRepo.findById(c.getCollege().getId())
                 .orElseThrow(() -> new RuntimeException("Invalid College"));
 
-        c.setProgram(p);
-        c.setCollege(clg);
+        c.setProgram(program);
+        c.setCollege(college);
+
         return courseRepo.save(c);
     }
 
     public Course updateCourse(Long id, Course c) {
+
         Course db = courseRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
+        Program program = programRepo.findById(c.getProgram().getId())
+                .orElseThrow(() -> new RuntimeException("Invalid Program"));
+
+        College college = collegeRepo.findById(c.getCollege().getId())
+                .orElseThrow(() -> new RuntimeException("Invalid College"));
+
         db.setCourseName(c.getCourseName());
-        db.setProgram(c.getProgram());
-        db.setCollege(c.getCollege());
+        db.setProgram(program);
+        db.setCollege(college);
 
         return courseRepo.save(db);
     }
@@ -100,4 +111,5 @@ public class ProgramCollegeCourseService {
         courseRepo.deleteById(id);
     }
 }
+
 
