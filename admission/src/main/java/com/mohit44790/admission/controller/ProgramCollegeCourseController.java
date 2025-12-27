@@ -1,5 +1,6 @@
 package com.mohit44790.admission.controller;
 
+import com.mohit44790.admission.dto.common.ApiResponse;
 import com.mohit44790.admission.entity.College;
 import com.mohit44790.admission.entity.Course;
 import com.mohit44790.admission.entity.Program;
@@ -17,76 +18,144 @@ public class ProgramCollegeCourseController {
     @Autowired
     private ProgramCollegeCourseService service;
 
-    // ---------- STUDENT ----------
+    // ================= STUDENT APIs =================
 
     @GetMapping("/programs")
-    public List<Program> programs() {
-        return service.getPrograms();
+    public ApiResponse<List<Program>> programs() {
+        return new ApiResponse<>(
+                true,
+                "Programs fetched successfully",
+                service.getPrograms()
+        );
     }
 
     @GetMapping("/colleges")
-    public List<College> colleges() {
-        return service.getColleges();
+    public ApiResponse<List<College>> colleges() {
+        return new ApiResponse<>(
+                true,
+                "Colleges fetched successfully",
+                service.getColleges()
+        );
     }
 
-    // UG -> all UG courses in all colleges
+    // Example: /courses/program/UG
     @GetMapping("/courses/program/{level}")
-    public List<Course> coursesByProgram(@PathVariable ProgramLevel level) {
-        return service.getCoursesByProgram(level);
+    public ApiResponse<List<Course>> coursesByProgram(
+            @PathVariable ProgramLevel level) {
+
+        return new ApiResponse<>(
+                true,
+                "Courses fetched for program " + level,
+                service.getCoursesByProgram(level)
+        );
     }
 
-    // UG + College
+    // Example: /courses/program/UG/college/1
     @GetMapping("/courses/program/{level}/college/{collegeId}")
-    public List<Course> coursesByProgramAndCollege(
+    public ApiResponse<List<Course>> coursesByProgramAndCollege(
             @PathVariable ProgramLevel level,
             @PathVariable Long collegeId) {
-        return service.getCoursesByProgramAndCollege(level, collegeId);
+
+        return new ApiResponse<>(
+                true,
+                "Courses fetched for selected program & college",
+                service.getCoursesByProgramAndCollege(level, collegeId)
+        );
     }
 
-    // ---------- ADMIN ----------
+    // ================= ADMIN APIs =================
+    // ⚠️ Secure using ROLE_ADMIN in SecurityConfig
 
     @PostMapping("/admin/program")
-    public Program addProgram(@RequestBody Program p) {
-        return service.addProgram(p);
+    public ApiResponse<Program> addProgram(@RequestBody Program p) {
+        return new ApiResponse<>(
+                true,
+                "Program added successfully",
+                service.addProgram(p)
+        );
     }
 
     @PutMapping("/admin/program/{id}")
-    public Program updateProgram(@PathVariable Long id, @RequestBody Program p) {
-        return service.updateProgram(id, p);
+    public ApiResponse<Program> updateProgram(
+            @PathVariable Long id,
+            @RequestBody Program p) {
+
+        return new ApiResponse<>(
+                true,
+                "Program updated successfully",
+                service.updateProgram(id, p)
+        );
     }
 
     @DeleteMapping("/admin/program/{id}")
-    public void deleteProgram(@PathVariable Long id) {
+    public ApiResponse<Void> deleteProgram(@PathVariable Long id) {
         service.deleteProgram(id);
+        return new ApiResponse<>(
+                true,
+                "Program deleted successfully",
+                null
+        );
     }
 
     @PostMapping("/admin/college")
-    public College addCollege(@RequestBody College c) {
-        return service.addCollege(c);
+    public ApiResponse<College> addCollege(@RequestBody College c) {
+        return new ApiResponse<>(
+                true,
+                "College added successfully",
+                service.addCollege(c)
+        );
     }
 
     @PutMapping("/admin/college/{id}")
-    public College updateCollege(@PathVariable Long id, @RequestBody College c) {
-        return service.updateCollege(id, c);
+    public ApiResponse<College> updateCollege(
+            @PathVariable Long id,
+            @RequestBody College c) {
+
+        return new ApiResponse<>(
+                true,
+                "College updated successfully",
+                service.updateCollege(id, c)
+        );
     }
 
     @DeleteMapping("/admin/college/{id}")
-    public void deleteCollege(@PathVariable Long id) {
+    public ApiResponse<Void> deleteCollege(@PathVariable Long id) {
         service.deleteCollege(id);
+        return new ApiResponse<>(
+                true,
+                "College deleted successfully",
+                null
+        );
     }
 
     @PostMapping("/admin/course")
-    public Course addCourse(@RequestBody Course c) {
-        return service.addCourse(c);
+    public ApiResponse<Course> addCourse(@RequestBody Course c) {
+        return new ApiResponse<>(
+                true,
+                "Course added successfully",
+                service.addCourse(c)
+        );
     }
 
     @PutMapping("/admin/course/{id}")
-    public Course updateCourse(@PathVariable Long id, @RequestBody Course c) {
-        return service.updateCourse(id, c);
+    public ApiResponse<Course> updateCourse(
+            @PathVariable Long id,
+            @RequestBody Course c) {
+
+        return new ApiResponse<>(
+                true,
+                "Course updated successfully",
+                service.updateCourse(id, c)
+        );
     }
 
     @DeleteMapping("/admin/course/{id}")
-    public void deleteCourse(@PathVariable Long id) {
+    public ApiResponse<Void> deleteCourse(@PathVariable Long id) {
         service.deleteCourse(id);
+        return new ApiResponse<>(
+                true,
+                "Course deleted successfully",
+                null
+        );
     }
 }

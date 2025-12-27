@@ -12,7 +12,6 @@ import com.mohit44790.admission.service.OtpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -28,14 +27,14 @@ public class AuthController {
 
     // ---------- SIGNUP ----------
     @PostMapping("/signup")
-    public ApiResponse signup(@RequestBody SignupRequest req) {
+    public ApiResponse<String> signup(@RequestBody SignupRequest req) {
         String msg = service.signup(req);
-        return new ApiResponse(true, msg);
+        return new ApiResponse<>(true, msg, null);
     }
 
     // ---------- VERIFY OTP ----------
     @PostMapping("/verify-otp")
-    public ApiResponse verify(@RequestBody OtpVerifyRequest r) {
+    public ApiResponse<Void> verify(@RequestBody OtpVerifyRequest r) {
 
         otpService.verify(r.getEmail(), r.getOtp());
 
@@ -45,24 +44,23 @@ public class AuthController {
         u.setVerified(true);
         userRepo.save(u);
 
-        return new ApiResponse(true, "OTP verified successfully");
+        return new ApiResponse<>(true, "OTP verified successfully", null);
     }
 
+    // ---------- RESEND OTP ----------
     @PostMapping("/resend-otp")
-    public ApiResponse resendOtp(@RequestParam String email) {
+    public ApiResponse<Void> resendOtp(@RequestParam String email) {
 
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Email not registered"));
 
         if (user.isVerified()) {
-            return new ApiResponse(false, "User already verified. Please login");
+            return new ApiResponse<>(false, "User already verified. Please login", null);
         }
 
         otpService.sendOtp(email);
-        return new ApiResponse(true, "OTP resent successfully");
+        return new ApiResponse<>(true, "OTP resent successfully", null);
     }
-
-
 
     // ---------- LOGIN ----------
     @PostMapping("/login")
@@ -70,5 +68,3 @@ public class AuthController {
         return service.login(req);
     }
 }
-
-

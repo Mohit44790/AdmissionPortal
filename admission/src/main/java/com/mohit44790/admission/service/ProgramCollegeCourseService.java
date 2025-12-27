@@ -29,12 +29,10 @@ public class ProgramCollegeCourseService {
         return collegeRepo.findAll();
     }
 
-    // Student selects UG → all UG courses in all colleges
     public List<Course> getCoursesByProgram(ProgramLevel level) {
         return courseRepo.findByProgram_Level(level);
     }
 
-    // Student selects UG + College
     public List<Course> getCoursesByProgramAndCollege(
             ProgramLevel level, Long collegeId) {
         return courseRepo.findByProgram_LevelAndCollege_Id(level, collegeId);
@@ -42,39 +40,74 @@ public class ProgramCollegeCourseService {
 
     // ================= ADMIN =================
 
-    // PROGRAM
+    // -------- PROGRAM --------
     public Program addProgram(Program p) {
+
+        programRepo.findByLevel(p.getLevel())
+                .ifPresent(x -> {
+                    throw new RuntimeException("Program level already exists");
+                });
+
         return programRepo.save(p);
     }
 
-    public Program updateProgram(Long id, Program p) {
-        Program db = programRepo.findById(id)
+    public Program updateProgram(Long id, Program updated) {
+
+        Program existing = programRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Program not found"));
-        db.setLevel(p.getLevel());
-        return programRepo.save(db);
+
+        programRepo.findByLevel(updated.getLevel())
+                .ifPresent(p -> {
+                    if (!p.getId().equals(id)) {
+                        throw new RuntimeException("Program level already exists");
+                    }
+                });
+
+        existing.setLevel(updated.getLevel());
+        return programRepo.save(existing);
     }
 
     public void deleteProgram(Long id) {
+
+        long count = courseRepo.countByProgram_Id(id);
+
+        if (count > 0) {
+            throw new RuntimeException(
+                    "Cannot delete program. Courses exist under this program"
+            );
+        }
+
         programRepo.deleteById(id);
     }
 
-    // COLLEGE
+    // -------- COLLEGE --------
     public College addCollege(College c) {
         return collegeRepo.save(c);
     }
 
     public College updateCollege(Long id, College c) {
+
         College db = collegeRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("College not found"));
+
         db.setCollegeName(c.getCollegeName());
         return collegeRepo.save(db);
     }
 
     public void deleteCollege(Long id) {
+
+        long count = courseRepo.countByCollege_Id(id);
+
+        if (count > 0) {
+            throw new RuntimeException(
+                    "Cannot delete college. Courses exist under this college"
+            );
+        }
+
         collegeRepo.deleteById(id);
     }
 
-    // COURSE
+    // -------- COURSE --------
     public Course addCourse(Course c) {
 
         Program program = programRepo.findById(c.getProgram().getId())
@@ -111,5 +144,6 @@ public class ProgramCollegeCourseService {
         courseRepo.deleteById(id);
     }
 }
+
 
 

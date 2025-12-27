@@ -11,33 +11,33 @@ public class GlobalExceptionHandler {
 
     // 🔴 BAD REQUEST (400)
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ApiResponse> handleBadRequest(BadRequestException ex) {
+    public ResponseEntity<ApiResponse<Void>> handleBadRequest(BadRequestException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(new ApiResponse(false, ex.getMessage()));
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
     }
 
     // 🔵 NOT FOUND (404)
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse> handleNotFound(ResourceNotFoundException ex) {
+    public ResponseEntity<ApiResponse<Void>> handleNotFound(ResourceNotFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(new ApiResponse(false, ex.getMessage()));
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
     }
 
-    // 🟠 GENERIC FALLBACK (500-safe)
+    // 🟠 RUNTIME / VALIDATION ERRORS (400)
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiResponse> handleRuntime(RuntimeException ex) {
+    public ResponseEntity<ApiResponse<Void>> handleRuntime(RuntimeException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(new ApiResponse(false, ex.getMessage()));
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
     }
 
-    // 🔥 ANY OTHER ERROR
+    // 🔥 UNKNOWN ERRORS (500)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse> handleException(Exception ex) {
+    public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiResponse(false, "Something went wrong"));
+                .body(new ApiResponse<>(false, "Something went wrong", null));
     }
 }
