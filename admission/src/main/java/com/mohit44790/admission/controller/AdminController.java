@@ -2,13 +2,13 @@ package com.mohit44790.admission.controller;
 
 import com.mohit44790.admission.dto.admin.AdmissionDecisionRequest;
 import com.mohit44790.admission.dto.common.ApiResponse;
-import com.mohit44790.admission.entity.StudentDocument;
-import com.mohit44790.admission.entity.StudentProfile;
-import com.mohit44790.admission.entity.User;
+import com.mohit44790.admission.entity.*;
+import com.mohit44790.admission.repository.UserRepository;
 import com.mohit44790.admission.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +19,9 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private UserRepository userRepo;
 
     // ================= DASHBOARD =================
 
@@ -36,7 +39,7 @@ public class AdminController {
     // ================= STUDENTS =================
 
     @GetMapping("/students")
-    public ApiResponse<List<User>> getAllStudents() {
+    public ApiResponse<List<User>> students() {
         return new ApiResponse<>(
                 true,
                 "Students fetched",
@@ -44,12 +47,8 @@ public class AdminController {
         );
     }
 
-    // ================= STUDENT PROFILE =================
-
     @GetMapping("/student/{userId}/profile")
-    public ApiResponse<StudentProfile> getStudentProfile(
-            @PathVariable Long userId) {
-
+    public ApiResponse<StudentProfile> profile(@PathVariable Long userId) {
         return new ApiResponse<>(
                 true,
                 "Student profile fetched",
@@ -57,12 +56,8 @@ public class AdminController {
         );
     }
 
-    // ================= STUDENT DOCUMENTS =================
-
     @GetMapping("/student/{userId}/documents")
-    public ApiResponse<List<StudentDocument>> getStudentDocuments(
-            @PathVariable Long userId) {
-
+    public ApiResponse<List<StudentDocument>> documents(@PathVariable Long userId) {
         return new ApiResponse<>(
                 true,
                 "Student documents fetched",
@@ -70,12 +65,16 @@ public class AdminController {
         );
     }
 
-    // AdminController.java (add endpoint)
+    // ================= ADMISSION DECISION =================
 
     @PostMapping("/student/{userId}/decision")
-    public ApiResponse<StudentProfile> admissionDecision(
+    public ApiResponse<StudentProfile> decide(
             @PathVariable Long userId,
-            @RequestBody AdmissionDecisionRequest req) {
+            @RequestBody AdmissionDecisionRequest req,
+            Principal principal) {
+
+        User admin = userRepo.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
 
         return new ApiResponse<>(
                 true,
@@ -83,9 +82,9 @@ public class AdminController {
                 adminService.decideAdmission(
                         userId,
                         req.getStatus(),
-                        req.getRemark()
+                        req.getRemark(),
+                        admin
                 )
         );
     }
-
 }
