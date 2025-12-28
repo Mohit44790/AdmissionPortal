@@ -11,46 +11,48 @@ public class StudentProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 🔐 mapping with user
+    // 🔐 User mapping
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // StudentProfile.java (add these fields)
+    // ✅ SELECTED COURSE
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
+
     @Enumerated(EnumType.STRING)
     private AdmissionStatus admissionStatus = AdmissionStatus.PENDING;
 
     private String adminRemark;
     private Double percentage;
 
-    // ---------- STEP 1 : PERSONAL ----------
+    // ---------- PERSONAL ----------
     private String fullName;
     private String alternatePhone;
     private String alternateEmail;
     private String gender;
     private String dob;
 
-    // ---------- STEP 2 : FAMILY ----------
+    // ---------- FAMILY ----------
     private String fatherName;
     private String motherName;
     private String familyIncome;
 
-    // ---------- STEP 3 : BANK ----------
+    // ---------- BANK ----------
     private String bankName;
     private String accountNumber;
     private String ifsc;
 
-    // ---------- STEP 4 : CATEGORY ----------
+    // ---------- CATEGORY ----------
     private String category;
     private String caste;
     private String quota;
 
-    // ---------- STEP 5 : OTHER ----------
+    // ---------- OTHER ----------
     private String nationality;
     private String religion;
     private String disability;
 
-    // ---------- STEP TRACKING ----------
     private int completedStep = 0;
 }
-

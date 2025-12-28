@@ -13,17 +13,35 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 🔗 Student mapping
     @ManyToOne
+    @JoinColumn(name = "student_profile_id", nullable = false)
     private StudentProfile studentProfile;
+
+    // 🔐 Gateway details
+    @Column(unique = true, nullable = false)
+    private String orderId;
+
+    private String transactionId;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status = PaymentStatus.PENDING;
 
     private Double amount;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus status; // PENDING, PAID, FAILED
-
-    private String orderId;        // Razorpay order_id
-    private String transactionId;  // payment_id
-
+    // 🕒 Audit fields
     private LocalDateTime createdAt;
-}
+    private LocalDateTime updatedAt;
 
+    // ✅ Auto set timestamps
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+}

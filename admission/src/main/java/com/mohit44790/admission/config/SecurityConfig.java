@@ -40,6 +40,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/webhook/**").permitAll()
                         .requestMatchers("/student/**").hasAnyRole("STUDENT","ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/master/admin/**").hasRole("ADMIN")

@@ -69,7 +69,7 @@ public class AdminController {
 
     // ================= ADMISSION DECISION =================
     @PostMapping("/student/{userId}/decision")
-    public ApiResponse<StudentProfile> decide(
+    public ApiResponse<Map<String, Object>> decide(
             @PathVariable Long userId,
             @RequestBody AdmissionDecisionRequest req,
             Principal principal) {
@@ -77,17 +77,26 @@ public class AdminController {
         User admin = userRepo.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Admin not found"));
 
+        StudentProfile profile = adminService.decideAdmission(
+                userId,
+                req.getStatus(),
+                req.getRemark(),
+                admin
+        );
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("profileId", profile.getId());
+        res.put("studentName", profile.getFullName());
+        res.put("status", profile.getAdmissionStatus());
+        res.put("remark", profile.getAdminRemark());
+
         return new ApiResponse<>(
                 true,
                 "Admission status updated",
-                adminService.decideAdmission(
-                        userId,
-                        req.getStatus(),
-                        req.getRemark(),
-                        admin
-                )
+                res
         );
     }
+
 
     // ================= REVIEW HISTORY =================
     @GetMapping("/student/{userId}/reviews")

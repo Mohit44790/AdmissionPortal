@@ -1,5 +1,6 @@
 package com.mohit44790.admission.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,6 +21,8 @@ public class StudentDocument {
 
     @ManyToOne
     @JoinColumn(name = "student_profile_id")
+    @JsonIgnore
     private StudentProfile studentProfile;
+
 }
 
