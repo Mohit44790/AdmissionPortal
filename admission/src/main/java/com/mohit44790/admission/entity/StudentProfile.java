@@ -16,6 +16,12 @@ public class StudentProfile {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // StudentProfile.java (add these fields)
+    @Enumerated(EnumType.STRING)
+    private AdmissionStatus admissionStatus = AdmissionStatus.PENDING;
+
+    private String adminRemark;
+
     // ---------- STEP 1 : PERSONAL ----------
     private String fullName;
     private String alternatePhone;
