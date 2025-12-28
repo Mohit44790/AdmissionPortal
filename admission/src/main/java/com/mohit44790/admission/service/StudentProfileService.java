@@ -15,24 +15,28 @@ import java.util.List;
 public class StudentProfileService {
 
     @Autowired
-    StudentProfileRepository repo;
+    private StudentProfileRepository repo;
+
     @Autowired
-    StudentDocumentRepository docRepo;
+    private StudentDocumentRepository docRepo;
 
     public StudentProfile getOrCreate(User user) {
         return repo.findByUser(user).orElseGet(() -> {
             StudentProfile p = new StudentProfile();
             p.setUser(user);
+            p.setCompletedStep(0);
             return repo.save(p);
         });
     }
 
     public StudentProfile save(StudentProfile profile, int step) {
-        profile.setCompletedStep(step);
+        if (step > profile.getCompletedStep()) {
+            profile.setCompletedStep(step);
+        }
         return repo.save(profile);
     }
 
-    // ✅ DOCUMENT SAVE
+    // 📄 DOCUMENT SAVE
     public void saveDocument(StudentProfile profile,
                              DocumentType type,
                              String path) {
@@ -49,4 +53,5 @@ public class StudentProfileService {
         return docRepo.findByStudentProfile(profile);
     }
 }
+
 

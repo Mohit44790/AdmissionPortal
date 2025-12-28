@@ -2,9 +2,11 @@ package com.mohit44790.admission.controller;
 
 import com.mohit44790.admission.dto.common.ApiResponse;
 import com.mohit44790.admission.dto.student.*;
+import com.mohit44790.admission.entity.Course;
 import com.mohit44790.admission.entity.Payment;
 import com.mohit44790.admission.entity.StudentProfile;
 import com.mohit44790.admission.entity.User;
+import com.mohit44790.admission.repository.CourseRepository;
 import com.mohit44790.admission.repository.PaymentRepository;
 import com.mohit44790.admission.repository.UserRepository;
 import com.mohit44790.admission.service.PaymentService;
@@ -23,6 +25,9 @@ public class StudentProfileController {
 
     @Autowired
     private StudentProfileService service;
+
+    @Autowired
+    private CourseRepository courseRepo;
 
     @Autowired
     private UserRepository userRepo;
@@ -154,6 +159,49 @@ public class StudentProfileController {
                 paymentRepo.findByStudentProfile(profile)
         );
     }
+
+    // StudentAdmissionController.java
+    @PostMapping("/select-course/{courseId}")
+    public ApiResponse<String> selectCourse(
+            @PathVariable Long courseId,
+            Principal principal) {
+
+        User user = userRepo.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // ✅ FIX: use injected `service`
+        StudentProfile profile = service.getOrCreate(user);
+
+        if (profile.getCompletedStep() < 5) {
+            throw new RuntimeException(
+                    "Please complete your profile before selecting course"
+            );
+        }
+
+        if (profile.getCourse() != null) {
+            throw new RuntimeException(
+                    "Course already selected"
+            );
+        }
+
+        // ✅ FIX: courseRepo injected
+        Course course = courseRepo.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Invalid course"));
+
+        profile.setCourse(course);
+
+        // Step 6 = course selected
+        service.save(profile, 6);
+
+        return new ApiResponse<>(
+                true,
+                "Course selected successfully",
+                course.getCourseName()
+        );
+    }
+
+
+
 
 
 }
