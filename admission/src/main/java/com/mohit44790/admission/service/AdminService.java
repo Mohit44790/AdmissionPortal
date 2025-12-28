@@ -1,15 +1,11 @@
 package com.mohit44790.admission.service;
 
-import com.mohit44790.admission.entity.AdmissionStatus;
-import com.mohit44790.admission.entity.StudentDocument;
-import com.mohit44790.admission.entity.StudentProfile;
-import com.mohit44790.admission.entity.User;
-import com.mohit44790.admission.repository.StudentDocumentRepository;
-import com.mohit44790.admission.repository.StudentProfileRepository;
-import com.mohit44790.admission.repository.UserRepository;
+import com.mohit44790.admission.entity.*;
+import com.mohit44790.admission.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,7 +20,14 @@ public class AdminService {
     @Autowired
     private StudentDocumentRepository documentRepo;
 
-    // 🔹 DASHBOARD COUNTS
+    @Autowired
+    private AdmissionReviewRepository reviewRepo;
+
+    @Autowired
+    private EmailService emailService;
+
+    // ================= DASHBOARD =================
+
     public long totalUsers() {
         return userRepo.count();
     }
@@ -32,7 +35,7 @@ public class AdminService {
     public long totalStudents() {
         return userRepo.findAll()
                 .stream()
-                .filter(u -> u.getRole().name().equals("STUDENT"))
+                .filter(u -> u.getRole() == Role.STUDENT)
                 .count();
     }
 
@@ -43,16 +46,17 @@ public class AdminService {
                 .count();
     }
 
-    // 🔹 GET ALL STUDENTS
+    // ================= STUDENTS =================
+
     public List<User> getAllStudents() {
         return userRepo.findAll()
                 .stream()
-                .filter(u -> u.getRole().name().equals("STUDENT"))
+                .filter(u -> u.getRole() == Role.STUDENT)
                 .toList();
     }
 
-    // 🔹 STUDENT PROFILE
     public StudentProfile getStudentProfile(Long userId) {
+
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -60,75 +64,47 @@ public class AdminService {
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
     }
 
-    // 🔹 STUDENT DOCUMENTS
     public List<StudentDocument> getStudentDocuments(Long userId) {
 
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        StudentProfile profile = profileRepo.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
-
+        StudentProfile profile = getStudentProfile(userId);
         return documentRepo.findByStudentProfile(profile);
     }
 
-    // AdminService.java (add methods)
+    // ================= ADMISSION DECISION =================
 
     public StudentProfile decideAdmission(Long userId,
                                           AdmissionStatus status,
-                                          String remark) {
+                                          String remark,
+                                          User adminUser) {
 
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        StudentProfile profile = profileRepo.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
+        StudentProfile profile = getStudentProfile(userId);
 
         if (profile.getCompletedStep() < 5) {
             throw new RuntimeException("Profile not completed");
         }
 
+        // ✅ Update profile
         profile.setAdmissionStatus(status);
         profile.setAdminRemark(remark);
-
-        return profileRepo.save(profile);
-    }
-
-    @Autowired
-    private EmailService emailService;
-
-    public StudentProfile decideAdmission(Long userId,
-                                          AdmissionStatus status,
-                                          String remark) {
-
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        StudentProfile profile = profileRepo.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
-
-        profile.setAdmissionStatus(status);
-        profile.setAdminRemark(remark);
-
         profileRepo.save(profile);
 
-        // 📧 EMAIL
+        // ✅ Save review history
+        AdmissionReview review = new AdmissionReview();
+        review.setAdmin(adminUser);
+        review.setStudentProfile(profile);
+        review.setStatus(status);
+        review.setRemark(remark);
+        review.setReviewedAt(LocalDateTime.now());
+
+        reviewRepo.save(review);
+
+        // ✅ Send email
         emailService.sendAdmissionStatus(
-                user.getEmail(),
+                profile.getUser().getEmail(),
                 status.name(),
                 remark
         );
 
         return profile;
     }
-    AdmissionReview review = new AdmissionReview();
-review.setAdmin(adminUser);
-review.setStudentProfile(profile);
-review.setStatus(status);
-review.setRemark(remark);
-review.setReviewedAt(LocalDateTime.now());
-
-reviewRepo.save(review);
-
-
 }

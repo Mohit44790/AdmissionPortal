@@ -3,6 +3,7 @@ package com.mohit44790.admission.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class EmailService {
     @Autowired
     private TemplateEngine templateEngine;
 
+    // OTP EMAIL
     public void sendOtp(String to, String otp) {
 
         try {
@@ -35,7 +37,6 @@ public class EmailService {
                     templateEngine.process("otp-email", context);
 
             helper.setText(htmlContent, true);
-
             mailSender.send(message);
 
         } catch (MessagingException e) {
@@ -43,6 +44,7 @@ public class EmailService {
         }
     }
 
+    // ADMISSION STATUS EMAIL
     public void sendAdmissionStatus(String to,
                                     String status,
                                     String remark) {
@@ -63,7 +65,6 @@ public class EmailService {
         Admission Office
         """.formatted(status, remark));
 
-        sender.send(mail);
+        mailSender.send(mail);
     }
-
 }
