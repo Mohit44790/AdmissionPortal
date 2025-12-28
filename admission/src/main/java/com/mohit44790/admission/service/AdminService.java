@@ -107,4 +107,8 @@ public class AdminService {
 
         return profile;
     }
+    public List<AdmissionReview> getReviewHistory(StudentProfile profile) {
+        return reviewRepo.findByStudentProfile(profile);
+    }
+
 }

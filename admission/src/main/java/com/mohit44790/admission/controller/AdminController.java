@@ -87,4 +87,18 @@ public class AdminController {
                 )
         );
     }
+
+    @GetMapping("/student/{userId}/reviews")
+    public ApiResponse<List<AdmissionReview>> reviewHistory(
+            @PathVariable Long userId) {
+
+        StudentProfile profile = adminService.getStudentProfile(userId);
+
+        return new ApiResponse<>(
+                true,
+                "Admission review history",
+                adminService.getReviewHistory(profile)
+        );
+    }
+
 }
