@@ -1,5 +1,6 @@
 package com.mohit44790.admission.controller;
 
+import com.mohit44790.admission.dto.common.ApiResponse;
 import com.mohit44790.admission.dto.student.*;
 import com.mohit44790.admission.entity.StudentProfile;
 import com.mohit44790.admission.entity.User;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/student/profile")
@@ -109,6 +112,24 @@ public class StudentProfileController {
         service.save(profile, 5);
         return "Other details saved";
     }
+
+    // StudentProfileController.java (add)
+
+    @GetMapping("/status")
+    public ApiResponse<Map<String, Object>> admissionStatus(Principal principal) {
+
+        User user = userRepo.findByEmail(principal.getName())
+                .orElseThrow();
+
+        StudentProfile profile = service.getOrCreate(user);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("status", profile.getAdmissionStatus());
+        data.put("remark", profile.getAdminRemark());
+
+        return new ApiResponse<>(true, "Admission status", data);
+    }
+
 }
 
 

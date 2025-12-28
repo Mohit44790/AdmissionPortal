@@ -1,5 +1,6 @@
 package com.mohit44790.admission.service;
 
+import com.mohit44790.admission.entity.AdmissionStatus;
 import com.mohit44790.admission.entity.StudentDocument;
 import com.mohit44790.admission.entity.StudentProfile;
 import com.mohit44790.admission.entity.User;
@@ -92,5 +93,34 @@ public class AdminService {
 
         return profileRepo.save(profile);
     }
+
+    @Autowired
+    private EmailService emailService;
+
+    public StudentProfile decideAdmission(Long userId,
+                                          AdmissionStatus status,
+                                          String remark) {
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        StudentProfile profile = profileRepo.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+
+        profile.setAdmissionStatus(status);
+        profile.setAdminRemark(remark);
+
+        profileRepo.save(profile);
+
+        // 📧 EMAIL
+        emailService.sendAdmissionStatus(
+                user.getEmail(),
+                status.name(),
+                remark
+        );
+
+        return profile;
+    }
+
 
 }

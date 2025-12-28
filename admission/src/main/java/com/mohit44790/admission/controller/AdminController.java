@@ -1,5 +1,6 @@
 package com.mohit44790.admission.controller;
 
+import com.mohit44790.admission.dto.admin.AdmissionDecisionRequest;
 import com.mohit44790.admission.dto.common.ApiResponse;
 import com.mohit44790.admission.entity.StudentDocument;
 import com.mohit44790.admission.entity.StudentProfile;
@@ -68,4 +69,23 @@ public class AdminController {
                 adminService.getStudentDocuments(userId)
         );
     }
+
+    // AdminController.java (add endpoint)
+
+    @PostMapping("/student/{userId}/decision")
+    public ApiResponse<StudentProfile> admissionDecision(
+            @PathVariable Long userId,
+            @RequestBody AdmissionDecisionRequest req) {
+
+        return new ApiResponse<>(
+                true,
+                "Admission status updated",
+                adminService.decideAdmission(
+                        userId,
+                        req.getStatus(),
+                        req.getRemark()
+                )
+        );
+    }
+
 }

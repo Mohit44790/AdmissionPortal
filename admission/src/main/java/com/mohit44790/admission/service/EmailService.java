@@ -42,4 +42,28 @@ public class EmailService {
             throw new RuntimeException("Failed to send OTP email", e);
         }
     }
+
+    public void sendAdmissionStatus(String to,
+                                    String status,
+                                    String remark) {
+
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(to);
+        mail.setSubject("Admission Status Update");
+
+        mail.setText("""
+        Dear Candidate,
+
+        Your admission status has been updated.
+
+        Status: %s
+        Remark: %s
+
+        Regards,
+        Admission Office
+        """.formatted(status, remark));
+
+        sender.send(mail);
+    }
+
 }
