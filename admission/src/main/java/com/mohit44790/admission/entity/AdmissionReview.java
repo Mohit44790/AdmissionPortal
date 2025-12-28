@@ -1,31 +1,32 @@
 package com.mohit44790.admission.entity;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Entity
-    @Data
-    public class AdmissionReview {
+@Data
+public class AdmissionReview {
 
-        @Id
-        @GeneratedValue
-        private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        @ManyToOne
-        private User admin;
+    // 👨‍💼 Admin who reviewed
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    private User admin;
 
-        @ManyToOne
-        private StudentProfile studentProfile;
+    // 🎓 Student profile
+    @ManyToOne
+    @JoinColumn(name = "student_profile_id")
+    private StudentProfile studentProfile;
 
-        @Enumerated(EnumType.STRING)
-        private AdmissionStatus status;
+    @Enumerated(EnumType.STRING)
+    private AdmissionStatus status; // APPROVED / REJECTED
 
-        private String remark;
+    private String remark;
 
-        private LocalDateTime reviewedAt;
-    }
-
-
+    private LocalDateTime reviewedAt;
+}
