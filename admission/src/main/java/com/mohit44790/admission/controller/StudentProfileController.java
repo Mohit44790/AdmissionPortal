@@ -2,21 +2,23 @@ package com.mohit44790.admission.controller;
 
 import com.mohit44790.admission.dto.common.ApiResponse;
 import com.mohit44790.admission.dto.student.*;
+import com.mohit44790.admission.entity.Payment;
 import com.mohit44790.admission.entity.StudentProfile;
 import com.mohit44790.admission.entity.User;
+import com.mohit44790.admission.repository.PaymentRepository;
 import com.mohit44790.admission.repository.UserRepository;
+import com.mohit44790.admission.service.PaymentService;
 import com.mohit44790.admission.service.StudentProfileService;
-import com.mohit44790.admission.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/student/profile")
+@RequestMapping("/student")
 public class StudentProfileController {
 
     @Autowired
@@ -25,16 +27,23 @@ public class StudentProfileController {
     @Autowired
     private UserRepository userRepo;
 
-    // 🔹 COMMON METHOD
+    @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
+    private PaymentRepository paymentRepo;
+
+    // 🔹 COMMON
     private StudentProfile getProfile(Principal principal) {
         User user = userRepo.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return service.getOrCreate(user);
     }
 
-    // ✅ GET PROFILE (EMAIL + MOBILE PREFILLED)
-    @GetMapping
+    // ================= PROFILE =================
+    @GetMapping("/profile")
     public StudentProfileResponse getProfileData(Principal principal) {
+
         User user = userRepo.findByEmail(principal.getName()).orElseThrow();
         StudentProfile profile = service.getOrCreate(user);
 
@@ -46,11 +55,10 @@ public class StudentProfileController {
         return res;
     }
 
-    // 1️⃣ PERSONAL DETAILS
-    @PostMapping("/personal")
-    public String personal(@RequestBody PersonalDetailsRequest req, Principal p) {
-        StudentProfile profile = getProfile(p);
+    @PostMapping("/profile/personal")
+    public ApiResponse<?> personal(@RequestBody PersonalDetailsRequest req, Principal p) {
 
+        StudentProfile profile = getProfile(p);
         profile.setFullName(req.getFullName());
         profile.setAlternatePhone(req.getAlternatePhone());
         profile.setAlternateEmail(req.getAlternateEmail());
@@ -58,70 +66,62 @@ public class StudentProfileController {
         profile.setDob(req.getDob());
 
         service.save(profile, 1);
-        return "Personal details saved";
+        return new ApiResponse<>(true, "Personal details saved", null);
     }
 
-    // 2️⃣ FAMILY DETAILS
-    @PostMapping("/family")
-    public String family(@RequestBody FamilyDetailsRequest req, Principal p) {
-        StudentProfile profile = getProfile(p);
+    @PostMapping("/profile/family")
+    public ApiResponse<?> family(@RequestBody FamilyDetailsRequest req, Principal p) {
 
+        StudentProfile profile = getProfile(p);
         profile.setFatherName(req.getFatherName());
         profile.setMotherName(req.getMotherName());
         profile.setFamilyIncome(req.getFamilyIncome());
 
         service.save(profile, 2);
-        return "Family details saved";
+        return new ApiResponse<>(true, "Family details saved", null);
     }
 
-    // 3️⃣ BANK DETAILS
-    @PostMapping("/bank")
-    public String bank(@RequestBody BankDetailsRequest req, Principal p) {
-        StudentProfile profile = getProfile(p);
+    @PostMapping("/profile/bank")
+    public ApiResponse<?> bank(@RequestBody BankDetailsRequest req, Principal p) {
 
+        StudentProfile profile = getProfile(p);
         profile.setBankName(req.getBankName());
         profile.setAccountNumber(req.getAccountNumber());
         profile.setIfsc(req.getIfsc());
 
         service.save(profile, 3);
-        return "Bank details saved";
+        return new ApiResponse<>(true, "Bank details saved", null);
     }
 
-    // 4️⃣ CATEGORY / QUOTA
-    @PostMapping("/category")
-    public String category(@RequestBody CategoryRequest req, Principal p) {
-        StudentProfile profile = getProfile(p);
+    @PostMapping("/profile/category")
+    public ApiResponse<?> category(@RequestBody CategoryRequest req, Principal p) {
 
+        StudentProfile profile = getProfile(p);
         profile.setCategory(req.getCategory());
         profile.setCaste(req.getCaste());
         profile.setQuota(req.getQuota());
 
         service.save(profile, 4);
-        return "Category details saved";
+        return new ApiResponse<>(true, "Category details saved", null);
     }
 
-    // 5️⃣ OTHER DETAILS
-    @PostMapping("/other")
-    public String other(@RequestBody OtherDetailsRequest req, Principal p) {
-        StudentProfile profile = getProfile(p);
+    @PostMapping("/profile/other")
+    public ApiResponse<?> other(@RequestBody OtherDetailsRequest req, Principal p) {
 
+        StudentProfile profile = getProfile(p);
         profile.setNationality(req.getNationality());
         profile.setReligion(req.getReligion());
         profile.setDisability(req.getDisability());
 
         service.save(profile, 5);
-        return "Other details saved";
+        return new ApiResponse<>(true, "Other details saved", null);
     }
 
-    // StudentProfileController.java (add)
-
-    @GetMapping("/status")
+    // ================= ADMISSION STATUS =================
+    @GetMapping("/admission/status")
     public ApiResponse<Map<String, Object>> admissionStatus(Principal principal) {
 
-        User user = userRepo.findByEmail(principal.getName())
-                .orElseThrow();
-
-        StudentProfile profile = service.getOrCreate(user);
+        StudentProfile profile = getProfile(principal);
 
         Map<String, Object> data = new HashMap<>();
         data.put("status", profile.getAdmissionStatus());
@@ -130,6 +130,28 @@ public class StudentProfileController {
         return new ApiResponse<>(true, "Admission status", data);
     }
 
+    // ================= PAYMENT =================
+    @PostMapping("/payment/create")
+    public ApiResponse<?> createPayment(Principal principal) {
+
+        StudentProfile profile = getProfile(principal);
+
+        return new ApiResponse<>(
+                true,
+                "Payment order created",
+                paymentService.createOrder(profile.getId())
+        );
+    }
+
+    @GetMapping("/payments")
+    public ApiResponse<List<Payment>> paymentHistory(Principal principal) {
+
+        StudentProfile profile = getProfile(principal);
+
+        return new ApiResponse<>(
+                true,
+                "Payment history",
+                paymentRepo.findByStudentProfile(profile)
+        );
+    }
 }
-
-

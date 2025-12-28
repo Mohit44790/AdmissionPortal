@@ -3,6 +3,7 @@ package com.mohit44790.admission.controller;
 import com.mohit44790.admission.dto.admin.AdmissionDecisionRequest;
 import com.mohit44790.admission.dto.common.ApiResponse;
 import com.mohit44790.admission.entity.*;
+import com.mohit44790.admission.repository.PaymentRepository;
 import com.mohit44790.admission.repository.UserRepository;
 import com.mohit44790.admission.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,10 @@ public class AdminController {
     @Autowired
     private UserRepository userRepo;
 
-    // ================= DASHBOARD =================
+    @Autowired
+    private PaymentRepository paymentRepo;
 
+    // ================= DASHBOARD =================
     @GetMapping("/dashboard")
     public ApiResponse<Map<String, Object>> dashboard() {
 
@@ -37,7 +40,6 @@ public class AdminController {
     }
 
     // ================= STUDENTS =================
-
     @GetMapping("/students")
     public ApiResponse<List<User>> students() {
         return new ApiResponse<>(
@@ -66,7 +68,6 @@ public class AdminController {
     }
 
     // ================= ADMISSION DECISION =================
-
     @PostMapping("/student/{userId}/decision")
     public ApiResponse<StudentProfile> decide(
             @PathVariable Long userId,
@@ -88,6 +89,7 @@ public class AdminController {
         );
     }
 
+    // ================= REVIEW HISTORY =================
     @GetMapping("/student/{userId}/reviews")
     public ApiResponse<List<AdmissionReview>> reviewHistory(
             @PathVariable Long userId) {
@@ -101,4 +103,15 @@ public class AdminController {
         );
     }
 
+    // ================= PAYMENTS REPORT =================
+    @GetMapping("/payments")
+    public ApiResponse<List<Payment>> allPayments(
+            @RequestParam(required = false) PaymentStatus status) {
+
+        List<Payment> data = (status == null)
+                ? paymentRepo.findAll()
+                : paymentRepo.findByStatus(status);
+
+        return new ApiResponse<>(true, "Payment report", data);
+    }
 }
