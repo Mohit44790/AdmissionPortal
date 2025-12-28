@@ -70,4 +70,27 @@ public class AdminService {
 
         return documentRepo.findByStudentProfile(profile);
     }
+
+    // AdminService.java (add methods)
+
+    public StudentProfile decideAdmission(Long userId,
+                                          AdmissionStatus status,
+                                          String remark) {
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        StudentProfile profile = profileRepo.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+
+        if (profile.getCompletedStep() < 5) {
+            throw new RuntimeException("Profile not completed");
+        }
+
+        profile.setAdmissionStatus(status);
+        profile.setAdminRemark(remark);
+
+        return profileRepo.save(profile);
+    }
+
 }
