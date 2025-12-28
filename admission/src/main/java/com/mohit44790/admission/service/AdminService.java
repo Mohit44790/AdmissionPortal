@@ -121,6 +121,14 @@ public class AdminService {
 
         return profile;
     }
+    AdmissionReview review = new AdmissionReview();
+review.setAdmin(adminUser);
+review.setStudentProfile(profile);
+review.setStatus(status);
+review.setRemark(remark);
+review.setReviewedAt(LocalDateTime.now());
+
+reviewRepo.save(review);
 
 
 }

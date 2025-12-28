@@ -21,6 +21,7 @@ public class StudentProfile {
     private AdmissionStatus admissionStatus = AdmissionStatus.PENDING;
 
     private String adminRemark;
+    private Double percentage;
 
     // ---------- STEP 1 : PERSONAL ----------
     private String fullName;
