@@ -1,0 +1,30 @@
+import { createBrowserRouter } from "react-router-dom";
+import Register from "../pages/auth/Register";
+import VerifyOtp from "../pages/auth/VerifyOtp";
+import Login from "../pages/auth/Login";
+import Layout from "../pages/Layout";
+import ProtectedRoute from "./ProtectedRoute";
+
+
+const AppRouter = createBrowserRouter([
+    { index: true, element: <Register /> },
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      { path: "verify-otp", element: <VerifyOtp /> },
+      { path: "login", element: <Login /> },
+      
+    ],
+  },
+   {
+      element: <ProtectedRoute />,
+    //   children: [
+    //     { path: "dashboard", element: <Dashboard /> },
+    //     { path: "admission", element: <AdmissionForm /> },
+    //     { path: "payment", element: <Payment /> },
+    //   ],
+    },
+]);
+
+export default AppRouter;

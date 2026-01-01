@@ -1,42 +1,104 @@
-import {createSlice ,createAsyncThunk} from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../services/api";
 
-export const register = createAsyncThunk(
-    "auth/register",
-    async (data,  { rejectWithValue }) =>{
-        try {
-            return await axios.post(`${api}/auth/register`, data);
-
-        } catch (error) {
-            return rejectWithValue(error.response.data);
-        }
+// ================= REGISTER =================
+export const registerUser = createAsyncThunk(
+  "auth/register",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await api.post("/auth/signup", data);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Register failed");
     }
-)
+  }
+);
 
+// ================= VERIFY OTP =================
+export const verifyOtp = createAsyncThunk(
+  "auth/verifyOtp",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await api.post("/auth/verify-otp", data);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "OTP verification failed");
+    }
+  }
+);
+
+// ================= LOGIN =================
+export const loginUser = createAsyncThunk(
+  "auth/login",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await api.post("/auth/login", data);
+
+      sessionStorage.setItem("token", res.data.token);
+      sessionStorage.setItem("user", JSON.stringify(res.data.user));
+
+      return res.data.user;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Login failed");
+    }
+  }
+);
+
+// ================= SLICE =================
 const authSlice = createSlice({
-    name:"auth",
-    initialState:{
-        user:null,
-        loading:false,
-        error:null
+  name: "auth",
+  initialState: {
+    user: JSON.parse(sessionStorage.getItem("user")) || null,
+    loading: false,
+    error: null,
+  },
+  reducers: {
+    logout: (state) => {
+      state.user = null;
+      sessionStorage.clear();
     },
-    reducers :{
+  },
+  extraReducers: (builder) => {
+    builder
+      // REGISTER
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-    },
-    extraReducers:(builder) =>{
-        builder
-        .addCase(register.pending, (state) =>{
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(register.fulfilled, (state, action) =>{
-            state.loading = false;
-            state.user = action.payload;
-        })
-        .addCase(register.rejected, (state, action) =>{
-            state.loading = false;
-            state.error = action.payload;
-        })
-    }
-})
+      // VERIFY OTP
+      .addCase(verifyOtp.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(verifyOtp.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(verifyOtp.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
+      // LOGIN
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
+});
+
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;

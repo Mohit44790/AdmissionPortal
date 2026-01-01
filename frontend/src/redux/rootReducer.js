@@ -1,6 +1,4 @@
 import { combineReducers } from "redux";
-
-// Import all your slices
 import authReducer from "./slices/authSlice";
 
 
