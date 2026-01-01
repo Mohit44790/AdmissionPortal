@@ -8,23 +8,19 @@ import ProtectedRoute from "./ProtectedRoute";
 
 const AppRouter = createBrowserRouter([
     { index: true, element: <Register /> },
+    { path: "verify-otp", element: <VerifyOtp /> },
+    { path: "login", element: <Login /> },
   {
     path: "/",
+    element: <ProtectedRoute />,
     element: <Layout />,
     children: [
-      { path: "verify-otp", element: <VerifyOtp /> },
-      { path: "login", element: <Login /> },
-      
+      // { path: "dashboard", element: <Dashboard /> },
+      // { path: "admission", element: <AdmissionForm /> },
+      // { path: "payment", element: <Payment /> },
     ],
   },
-   {
-      element: <ProtectedRoute />,
-    //   children: [
-    //     { path: "dashboard", element: <Dashboard /> },
-    //     { path: "admission", element: <AdmissionForm /> },
-    //     { path: "payment", element: <Payment /> },
-    //   ],
-    },
+   
 ]);
 
 export default AppRouter;

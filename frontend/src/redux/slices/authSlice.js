@@ -1,6 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../services/api";
 
+// ================= SAFE PARSE =================
+const getStoredUser = () => {
+  try {
+    const user = sessionStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+  } catch {
+    return null;
+  }
+};
+
 // ================= REGISTER =================
 export const registerUser = createAsyncThunk(
   "auth/register",
@@ -48,13 +58,14 @@ export const loginUser = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: JSON.parse(sessionStorage.getItem("user")) || null,
+    user: getStoredUser(), // ✅ SAFE
     loading: false,
     error: null,
   },
   reducers: {
     logout: (state) => {
       state.user = null;
+      state.error = null;
       sessionStorage.clear();
     },
   },
@@ -76,6 +87,7 @@ const authSlice = createSlice({
       // VERIFY OTP
       .addCase(verifyOtp.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(verifyOtp.fulfilled, (state) => {
         state.loading = false;
@@ -88,6 +100,7 @@ const authSlice = createSlice({
       // LOGIN
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;

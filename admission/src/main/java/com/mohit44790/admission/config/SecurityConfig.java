@@ -26,9 +26,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+                // ✅ ENABLE CORS
+                .cors(cors -> {})
+
+                // ❌ Disable CSRF for APIs
                 .csrf(csrf -> csrf.disable())
 
-                // ❌ default login / basic auth disable
+                // ❌ disable default login
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
 
@@ -58,3 +62,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+
