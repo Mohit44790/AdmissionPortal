@@ -42,7 +42,7 @@ const Navbar = () => {
         
         {/* Logo */}
         <div
-          className="flex items-center gap-2 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2  cursor-pointer hover:opacity-80 transition-opacity"
           onClick={handleLogoClick}
         >
           <img src="https://dseuadm.samarth.edu.in/assets/759660c7/site_files/dseu_logo.png" alt="DSEU Logo" className="h-12" />
@@ -59,8 +59,8 @@ const Navbar = () => {
 >
   {/* GRADIENT RING */}
   <div className="relative">
-  <div className="p-[2px] rounded-full bg-gradient-to-br from-blue-600 to-indigo-600">
-    <div className="bg-white rounded-full p-[2px]">
+  <div className="p-0.5 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600">
+    <div className="bg-white rounded-full p-0.5 ">
       <img
         src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw7Ruc3aDfDuCbY_FFQ-23U1on7qndeh-dNw&s"
         alt="Profile"
