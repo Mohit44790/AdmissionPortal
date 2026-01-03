@@ -122,7 +122,7 @@ const VerifyOtp = () => {
             </button>
           </form>
 
-          <p className="text-violet-950 text-sm font-bold text-center mt-6 opacity-80">
+          <p className="text-violet-950 text-sm font-boldc text-center mt-6 opacity-80">
             Didn’t receive OTP?{" "}
             <span className="underline cursor-pointer hover:text-white">
               Resend
