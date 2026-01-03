@@ -2,8 +2,3 @@
 @import "@fortawesome/fontawesome-free/css/all.min.css";
 
 
-.social-icon {
-  @apply w-9 h-9 flex items-center justify-center rounded-full 
-         bg-white/10 text-gray-300 hover:bg-white hover:text-[#0f172a]
-         transition;
-}

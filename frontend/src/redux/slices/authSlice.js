@@ -44,15 +44,35 @@ export const loginUser = createAsyncThunk(
     try {
       const res = await api.post("/auth/login", data);
 
-      sessionStorage.setItem("token", res.data.token);
-      sessionStorage.setItem("user", JSON.stringify(res.data.user));
+      // ✅ Extract from backend response
+      const { token, name, email, mobile } = res.data;
 
-      return res.data.user;
+      if (!token) {
+        throw new Error("Token not received");
+      }
+
+      const user = {
+        name,
+        email,
+        mobile,
+        
+      };
+
+      // ✅ Persist session
+      sessionStorage.setItem("token", token);
+      sessionStorage.setItem("user", JSON.stringify(user));
+
+      return user; // 👈 Redux user
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Login failed");
+      return rejectWithValue(
+        error.response?.data?.message ||
+        error.message ||
+        "Login failed"
+      );
     }
   }
 );
+
 
 // ================= SLICE =================
 const authSlice = createSlice({
