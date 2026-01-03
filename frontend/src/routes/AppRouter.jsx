@@ -4,6 +4,7 @@ import VerifyOtp from "../pages/auth/VerifyOtp";
 import Login from "../pages/auth/Login";
 import Layout from "../pages/Layout";
 import ProtectedRoute from "./ProtectedRoute";
+import Dashboard from "../pages/Dashboard";
 
 
 const AppRouter = createBrowserRouter([
@@ -15,7 +16,7 @@ const AppRouter = createBrowserRouter([
     element: <ProtectedRoute />,
     element: <Layout />,
     children: [
-      // { path: "dashboard", element: <Dashboard /> },
+      { path: "dashboard", element: <Dashboard /> },
       // { path: "admission", element: <AdmissionForm /> },
       // { path: "payment", element: <Payment /> },
     ],
