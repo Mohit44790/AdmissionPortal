@@ -5,6 +5,7 @@ import Login from "../pages/auth/Login";
 import Layout from "../pages/Layout";
 import ProtectedRoute from "./ProtectedRoute";
 import Dashboard from "../pages/Dashboard";
+import Profile from "../components/Profile/Profile";
 
 
 const AppRouter = createBrowserRouter([
@@ -17,6 +18,7 @@ const AppRouter = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: "dashboard", element: <Dashboard /> },
+      { path: "profile", element: <Profile /> },
       // { path: "admission", element: <AdmissionForm /> },
       // { path: "payment", element: <Payment /> },
     ],
