@@ -65,7 +65,7 @@ const handleSubmit = async (e) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#C7C5F4] via-[#9F9BD8] to-[#776BCC]">
-      <div className="relative w-125 h-[580px] bg-gradient-to-br from-[#5D54A4] to-[#7C78B8] shadow-[0_20px_60px_rgba(0,0,0,0.35)] overflow-hidden rounded-3xl">
+      <div className="relative w-[500px] h-[580px] bg-gradient-to-br from-[#5D54A4] to-[#7C78B8] shadow-[0_20px_60px_rgba(0,0,0,0.35)] overflow-hidden rounded-3xl">
 
         {/* Background Shapes */}
         <span className="absolute w-[520px] h-[520px] bg-white/90 top-[-60px] right-[120px] rotate-45 rounded-tr-[72px]" />
