@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../redux/slices/authSlice";
+import { showErrorToast, showSuccessToast } from "../../utils/toast";
+
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -13,20 +15,38 @@ const Login = () => {
     password: "",
   });
 
-  const handleChange = (e) =>
+ 
+
+  
+
+ const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const res = await dispatch(loginUser(formData));
-    if (res.meta.requestStatus === "fulfilled") {
-      navigate("/dashboard");
+
+    // ❌ Login failed
+    if (res.meta.requestStatus === "rejected") {
+      showErrorToast(
+        res.payload?.message || "Invalid email or password"
+      );
+      return;
     }
+
+    // ✅ Login success
+    showSuccessToast("Login successful");
+
+    setTimeout(() => {
+      navigate("/dashboard");
+    }, 1200);
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#C7C5F4] via-[#9F9BD8] to-[#776BCC]">
-      <div className="relative w-[480px] h-[590px] bg-gradient-to-br from-[#5D54A4] to-[#7C78B8] shadow-[0_20px_60px_rgba(0,0,0,0.35)] overflow-hidden rounded-3xl">
+      <div className="relative w-[500px] h-[580px] bg-gradient-to-br from-[#5D54A4] to-[#7C78B8] shadow-[0_20px_60px_rgba(0,0,0,0.35)] overflow-hidden rounded-3xl">
 
         {/* Background Shapes */}
         <span className="absolute w-[520px] h-[520px] bg-white/90 top-[-60px] right-[120px] rotate-45 rounded-tr-[72px]" />
