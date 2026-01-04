@@ -1,6 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../services/api";
 
+/* ================= COMMON HANDLER ================= */
+
+const handleApiError = (err, fallback) =>
+  err?.response?.data?.message || fallback;
+
 /* ================= SAVE THUNKS ================= */
 
 // PERSONAL
@@ -9,9 +14,9 @@ export const savePersonalProfile = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const res = await api.post("/student/profile/personal", data);
-      return res.data;
+      return res.data?.profile || res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Personal save failed");
+      return rejectWithValue(handleApiError(err, "Personal save failed"));
     }
   }
 );
@@ -22,9 +27,9 @@ export const saveFamilyProfile = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const res = await api.post("/student/profile/family", data);
-      return res.data;
+      return res.data?.profile || res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Family save failed");
+      return rejectWithValue(handleApiError(err, "Family save failed"));
     }
   }
 );
@@ -35,9 +40,9 @@ export const saveBankProfile = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const res = await api.post("/student/profile/bank", data);
-      return res.data;
+      return res.data?.profile || res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Bank save failed");
+      return rejectWithValue(handleApiError(err, "Bank save failed"));
     }
   }
 );
@@ -48,9 +53,9 @@ export const saveCategoryProfile = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const res = await api.post("/student/profile/category", data);
-      return res.data;
+      return res.data?.profile || res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Category save failed");
+      return rejectWithValue(handleApiError(err, "Category save failed"));
     }
   }
 );
@@ -61,9 +66,9 @@ export const saveOtherProfile = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const res = await api.post("/student/profile/other", data);
-      return res.data;
+      return res.data?.profile || res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Other save failed");
+      return rejectWithValue(handleApiError(err, "Other save failed"));
     }
   }
 );
@@ -75,40 +80,31 @@ export const fetchStudentProfile = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await api.get("/student/profile");
-      return res.data;
+      return res.data?.profile;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch profile"
-      );
+      return rejectWithValue(handleApiError(err, "Failed to fetch profile"));
     }
   }
 );
 
 /* ================= SLICE ================= */
 
+const initialState = {
+  personal: null,
+  family: null,
+  bank: null,
+  category: null,
+  other: null,
+  completedStep: 0,
+  loading: false,
+  error: null,
+};
+
 const studentSlice = createSlice({
   name: "studentProfile",
-  initialState: {
-    personal: null,
-    family: null,
-    bank: null,
-    category: null,
-    completedStep: 0,
-    other: null,
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
-    resetStudentProfile: (state) => {
-      state.personal = null;
-      state.family = null;
-      state.bank = null;
-      state.category = null;
-      state.completedStep = 0;
-      state.other = null;
-      state.loading = false;
-      state.error = null;
-    },
+    resetStudentProfile: () => initialState,
   },
   extraReducers: (builder) => {
     const pending = (state) => {
@@ -121,55 +117,60 @@ const studentSlice = createSlice({
       state.error = action.payload;
     };
 
+    const fulfilledStep = (state, step) => {
+      state.loading = false;
+      state.completedStep = Math.max(state.completedStep, step);
+    };
+
     builder
-      // SAVE PERSONAL
+      /* ---------- SAVE PERSONAL ---------- */
       .addCase(savePersonalProfile.pending, pending)
       .addCase(savePersonalProfile.fulfilled, (state, action) => {
-        state.loading = false;
         state.personal = action.payload;
+        fulfilledStep(state, 1);
       })
       .addCase(savePersonalProfile.rejected, rejected)
 
-      // SAVE FAMILY
+      /* ---------- SAVE FAMILY ---------- */
       .addCase(saveFamilyProfile.pending, pending)
       .addCase(saveFamilyProfile.fulfilled, (state, action) => {
-        state.loading = false;
         state.family = action.payload;
+        fulfilledStep(state, 2);
       })
       .addCase(saveFamilyProfile.rejected, rejected)
 
-      // SAVE BANK
+      /* ---------- SAVE BANK ---------- */
       .addCase(saveBankProfile.pending, pending)
       .addCase(saveBankProfile.fulfilled, (state, action) => {
-        state.loading = false;
         state.bank = action.payload;
+        fulfilledStep(state, 3);
       })
       .addCase(saveBankProfile.rejected, rejected)
 
-      // SAVE CATEGORY
+      /* ---------- SAVE CATEGORY ---------- */
       .addCase(saveCategoryProfile.pending, pending)
       .addCase(saveCategoryProfile.fulfilled, (state, action) => {
-        state.loading = false;
         state.category = action.payload;
+        fulfilledStep(state, 4);
       })
       .addCase(saveCategoryProfile.rejected, rejected)
 
-      // SAVE OTHER
+      /* ---------- SAVE OTHER ---------- */
       .addCase(saveOtherProfile.pending, pending)
       .addCase(saveOtherProfile.fulfilled, (state, action) => {
-        state.loading = false;
         state.other = action.payload;
+        fulfilledStep(state, 5);
       })
       .addCase(saveOtherProfile.rejected, rejected)
 
-      // FETCH PROFILE
+      /* ---------- FETCH PROFILE ---------- */
       .addCase(fetchStudentProfile.pending, pending)
       .addCase(fetchStudentProfile.fulfilled, (state, action) => {
+        const p = action.payload;
+        if (!p) return;
+
         state.loading = false;
-
-       const p = action.payload.profile;
-
-        state.completedStep = p.completedStep;
+        state.completedStep = p.completedStep || 0;
 
         state.personal = {
           fullName: p.fullName,

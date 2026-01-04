@@ -1,19 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { saveOtherProfile } from "../../redux/slices/studentSlice";
 
-
 const OtherDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((s) => s.studentProfile);
+  const { other, loading, error } = useSelector((s) => s.studentProfile);
 
   const [formData, setFormData] = useState({
     nationality: "",
     religion: "",
     disability: "",
   });
+
+  // Pre-fill form with Redux data if available
+  useEffect(() => {
+    if (other) {
+      setFormData({
+        nationality: other.nationality || "",
+        religion: other.religion || "",
+        disability: other.disability || "",
+      });
+    }
+  }, [other]);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,7 +32,7 @@ const OtherDetails = () => {
     e.preventDefault();
     const res = await dispatch(saveOtherProfile(formData));
     if (res.meta.requestStatus === "fulfilled") {
-      navigate("/dashboard"); // admission completed
+      navigate("/dashboard"); // Admission completed
     }
   };
 
@@ -40,6 +50,7 @@ const OtherDetails = () => {
           <input
             name="nationality"
             placeholder="Nationality"
+            value={formData.nationality}
             onChange={handleChange}
             className="w-full bg-white/90 text-gray-800 placeholder-gray-500 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
             required
@@ -49,6 +60,7 @@ const OtherDetails = () => {
           <input
             name="religion"
             placeholder="Religion"
+            value={formData.religion}
             onChange={handleChange}
             className="w-full bg-white/90 text-gray-800 placeholder-gray-500 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
             required
@@ -57,6 +69,7 @@ const OtherDetails = () => {
           {/* Disability */}
           <select
             name="disability"
+            value={formData.disability}
             onChange={handleChange}
             className="w-full bg-white/90 text-gray-800 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
             required

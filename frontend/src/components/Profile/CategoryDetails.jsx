@@ -1,20 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { saveCategoryProfile } from "../../redux/slices/studentSlice";
 import { nextStep } from "../../redux/slices/admissionSlice";
 
-
 const CategoryDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((s) => s.studentProfile);
+  const { category: categoryState, loading, error } = useSelector(
+    (s) => s.studentProfile
+  );
 
   const [formData, setFormData] = useState({
     category: "",
     caste: "",
     quota: "",
   });
+
+  // Pre-fill form if Redux has saved category info
+  useEffect(() => {
+    if (categoryState) {
+      setFormData({
+        category: categoryState.category || "",
+        caste: categoryState.caste || "",
+        quota: categoryState.quota || "",
+      });
+    }
+  }, [categoryState]);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,8 +35,9 @@ const CategoryDetails = () => {
     e.preventDefault();
     const res = await dispatch(saveCategoryProfile(formData));
     if (res.meta.requestStatus === "fulfilled") {
-        dispatch(nextStep()); // ✅ correct
-      }
+      dispatch(nextStep());
+      // Optional: navigate("/other-details");
+    }
   };
 
   return (
@@ -40,6 +53,7 @@ const CategoryDetails = () => {
           {/* Category */}
           <select
             name="category"
+            value={formData.category}
             onChange={handleChange}
             className="w-full bg-white/90 text-gray-800 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
             required
@@ -55,6 +69,7 @@ const CategoryDetails = () => {
           <input
             name="caste"
             placeholder="Caste"
+            value={formData.caste}
             onChange={handleChange}
             className="w-full bg-white/90 text-gray-800 placeholder-gray-500 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
             required
@@ -63,6 +78,7 @@ const CategoryDetails = () => {
           {/* Quota */}
           <select
             name="quota"
+            value={formData.quota}
             onChange={handleChange}
             className="w-full bg-white/90 text-gray-800 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
             required

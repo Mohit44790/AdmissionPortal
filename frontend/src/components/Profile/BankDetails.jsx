@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { saveBankProfile } from "../../redux/slices/studentSlice";
 import { nextStep } from "../../redux/slices/admissionSlice";
 
-
 const BankDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((s) => s.studentProfile);
+
+  const { bank, loading, error } = useSelector((s) => s.studentProfile);
 
   const [formData, setFormData] = useState({
     bankName: "",
@@ -16,15 +16,28 @@ const BankDetails = () => {
     ifsc: "",
   });
 
+  // Pre-fill form if bank details exist
+  useEffect(() => {
+    if (bank) {
+      setFormData({
+        bankName: bank.bankName || "",
+        accountNumber: bank.accountNumber || "",
+        ifsc: bank.ifsc || "",
+      });
+    }
+  }, [bank]);
+
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const res = await dispatch(saveBankProfile(formData));
-   if (res.meta.requestStatus === "fulfilled") {
-       dispatch(nextStep()); // ✅ correct
-     }
+    if (res.meta.requestStatus === "fulfilled") {
+      dispatch(nextStep());
+      // Optional: navigate to next step
+      // navigate("/category-details");
+    }
   };
 
   return (
@@ -43,6 +56,7 @@ const BankDetails = () => {
             <input
               name="bankName"
               placeholder="Bank Name"
+              value={formData.bankName}
               onChange={handleChange}
               className="w-full bg-white/90 text-gray-800 placeholder-gray-500 rounded-lg pl-10 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
               required
@@ -56,6 +70,7 @@ const BankDetails = () => {
               name="accountNumber"
               type="text"
               placeholder="Account Number"
+              value={formData.accountNumber}
               onChange={handleChange}
               className="w-full bg-white/90 text-gray-800 placeholder-gray-500 rounded-lg pl-10 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
               required
@@ -68,6 +83,7 @@ const BankDetails = () => {
             <input
               name="ifsc"
               placeholder="IFSC Code"
+              value={formData.ifsc}
               onChange={handleChange}
               className="w-full bg-white/90 text-gray-800 placeholder-gray-500 uppercase tracking-widest rounded-lg pl-10 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
               required

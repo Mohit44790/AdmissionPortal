@@ -7,10 +7,17 @@ import FamilyDetails from "../../Profile/FamilyDetails";
 import BankDetails from "../../Profile/BankDetails";
 import CategoryDetails from "../../Profile/CategoryDetails";
 import OtherDetails from "../../Profile/OtherDetails";
+import { fetchStudentProfile } from "../../../redux/slices/studentSlice";
+import { useEffect } from "react";
 
 const AdmissionForm = () => {
   const { step } = useSelector((s) => s.admission);
   const dispatch = useDispatch();
+
+
+  useEffect(() => {
+  dispatch(fetchStudentProfile());
+}, [dispatch]);
 
   const renderStep = () => {
     switch (step) {

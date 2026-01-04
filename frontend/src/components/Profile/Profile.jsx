@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { nextStep, saveStepData } from "../../redux/slices/admissionSlice";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { nextStep } from "../../redux/slices/admissionSlice";
 import { savePersonalProfile } from "../../redux/slices/studentSlice";
 
 const Profile = () => {
-  const dispatch = useDispatch();
+const dispatch = useDispatch();
+  const { personal, loading } = useSelector((s) => s.studentProfile);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -14,22 +15,28 @@ const Profile = () => {
     dob: "",
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  /* 🔥 PREFILL FROM REDUX */
+  useEffect(() => {
+    if (personal) {
+      setFormData({
+        fullName: personal.fullName || "",
+        alternatePhone: personal.alternatePhone || "",
+        alternateEmail: personal.alternateEmail || "",
+        gender: personal.gender || "",
+        dob: personal.dob || "",
+      });
+    }
+  }, [personal]);
+
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🔥 1️⃣ CALL BACKEND API
     const res = await dispatch(savePersonalProfile(formData));
 
     if (res.meta.requestStatus === "fulfilled") {
-      // 🔥 2️⃣ SAVE IN ADMISSION REDUX (for review / stepper)
-      dispatch(saveStepData(formData));
-
-      // 🔥 3️⃣ MOVE TO NEXT STEP
       dispatch(nextStep());
     }
   };
