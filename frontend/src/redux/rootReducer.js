@@ -1,12 +1,13 @@
 import { combineReducers } from "redux";
 import authReducer from "./slices/authSlice";
-import studentReducer from "./slices/studentSlice";
-
+import studentProfileReducer from "./slices/studentSlice";
+import admissionReducer from "./slices/admissionSlice";
 
 // Combine reducers
 const rootReducer = combineReducers({
   auth: authReducer,
-  student: studentReducer,
+  studentProfile: studentProfileReducer,
+  admission: admissionReducer,
  
  
 });

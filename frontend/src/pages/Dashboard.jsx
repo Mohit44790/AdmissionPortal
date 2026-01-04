@@ -1,18 +1,34 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchStudentProfile } from "../redux/slices/studentSlice";
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
+
   const user = useSelector((state) => state.auth.user);
+  const { completedStep, loading } = useSelector(
+    (state) => state.studentProfile
+  );
 
   const currentYear = new Date().getFullYear();
   const nextYear = currentYear + 1;
 
-  const isProfileComplete =
-    user?.name && user?.email && user?.mobile && user?.dob;
+  useEffect(() => {
+    dispatch(fetchStudentProfile());
+  }, [dispatch]);
 
-  /* ❌ Profile incomplete */
-  if (!isProfileComplete) {
+  // ⏳ Loading state
+  if (loading) {
+    return (
+      <p className="text-center mt-20 text-gray-600">
+        Loading dashboard...
+      </p>
+    );
+  }
+
+  // ❌ Profile incomplete
+  if (completedStep !== 5) {
     return (
       <DashboardMessage
         title="Complete your profile"
@@ -25,7 +41,7 @@ const Dashboard = () => {
     );
   }
 
-  /* ✅ Profile complete */
+  // ✅ Profile complete
   return (
     <div className="max-w-7xl mx-auto px-6 pt-16 pb-24">
       {/* Header */}
@@ -40,10 +56,9 @@ const Dashboard = () => {
 
       {/* Main Card */}
       <div className="relative bg-white/70 backdrop-blur-xl border border-gray-200 rounded-3xl shadow-xl p-10 md:p-14">
-        {/* Greeting */}
         <h2 className="text-2xl md:text-3xl font-semibold text-gray-900">
           Welcome back,{" "}
-          <span className="text-blue-600">{user.name}</span>
+          <span className="text-blue-600">{user?.name}</span>
         </h2>
 
         <p className="text-gray-600 mt-4 max-w-2xl">
@@ -51,7 +66,6 @@ const Dashboard = () => {
           applications, review updates, and make changes anytime.
         </p>
 
-        {/* Actions */}
         <div className="mt-10 flex flex-wrap gap-4">
           <Link to="/applications">
             <button className="px-7 py-3 rounded-xl bg-blue-600 text-white font-medium shadow hover:bg-blue-700 transition">
@@ -73,7 +87,7 @@ const Dashboard = () => {
 export default Dashboard;
 
 /* ----------------------------------------------------------
-   MODERN MESSAGE (PROFILE INCOMPLETE)
+   PROFILE INCOMPLETE MESSAGE
 ----------------------------------------------------------- */
 
 const DashboardMessage = ({
@@ -85,7 +99,7 @@ const DashboardMessage = ({
   nextYear,
 }) => {
   return (
-    <div className="min-h-[70vh] flex items-center mt-4 justify-center px-4">
+    <div className="min-h-[70vh] flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white/80 backdrop-blur-xl border border-gray-200 rounded-3xl shadow-2xl p-10 text-center">
         <h1 className="inline-block px-4 py-1 text-2xl font-bold rounded-full bg-blue-50 text-blue-600 mb-4">
           Admission Portal {currentYear}–{nextYear}
@@ -100,7 +114,7 @@ const DashboardMessage = ({
         </p>
 
         <Link to={buttonLink}>
-          <button className="mt-8 w-full py-3 cursor-pointer rounded-xl bg-blue-600 text-white font-medium shadow hover:bg-blue-700 transition">
+          <button className="mt-8 w-full py-3 rounded-xl bg-blue-600 text-white font-medium shadow hover:bg-blue-700 transition">
             {buttonText}
           </button>
         </Link>

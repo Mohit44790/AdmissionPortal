@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+export const TOTAL_STEPS = 5;
+
 const admissionSlice = createSlice({
   name: "admission",
   initialState: {
@@ -11,10 +13,10 @@ const admissionSlice = createSlice({
       state.data = { ...state.data, ...action.payload };
     },
     nextStep: (state) => {
-      state.step += 1;
+      if (state.step < TOTAL_STEPS) state.step += 1;
     },
     prevStep: (state) => {
-      state.step -= 1;
+      if (state.step > 1) state.step -= 1;
     },
     resetAdmission: (state) => {
       state.step = 1;

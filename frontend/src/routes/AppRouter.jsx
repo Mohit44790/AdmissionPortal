@@ -6,6 +6,8 @@ import Layout from "../pages/Layout";
 import ProtectedRoute from "./ProtectedRoute";
 import Dashboard from "../pages/Dashboard";
 import Profile from "../components/Profile/Profile";
+import AdmissionForm from "../components/Application/Admission/AdmissionForm";
+import StudentProfileView from "../components/Profile/StudentProfileView";
 
 const AppRouter = createBrowserRouter([
   { index: true, element: <Register /> },
@@ -21,7 +23,15 @@ const AppRouter = createBrowserRouter([
     ),
     children: [
       { path: "dashboard", element: <Dashboard /> },
-      { path: "profile", element: <Profile /> },
+      {
+  path: "profile",
+  element: <AdmissionForm />,
+
+},{
+  path: "profile/view",
+  element: <StudentProfileView />,
+}
+
     ],
   },
 ]);

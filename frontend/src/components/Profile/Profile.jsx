@@ -1,6 +1,11 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { nextStep, saveStepData } from "../../redux/slices/admissionSlice";
+import { savePersonalProfile } from "../../redux/slices/studentSlice";
 
 const Profile = () => {
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     fullName: "",
     alternatePhone: "",
@@ -9,17 +14,24 @@ const Profile = () => {
     dob: "",
   });
 
-  const [submitted, setSubmitted] = useState(false);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Profile Data:", formData);
-    setSubmitted(true);
+
+    // 🔥 1️⃣ CALL BACKEND API
+    const res = await dispatch(savePersonalProfile(formData));
+
+    if (res.meta.requestStatus === "fulfilled") {
+      // 🔥 2️⃣ SAVE IN ADMISSION REDUX (for review / stepper)
+      dispatch(saveStepData(formData));
+
+      // 🔥 3️⃣ MOVE TO NEXT STEP
+      dispatch(nextStep());
+    }
   };
 
   return (
@@ -29,14 +41,10 @@ const Profile = () => {
           Student Profile
         </h1>
 
-        {submitted && (
-          <div className="mb-6 rounded-lg bg-green-100 px-4 py-3 text-green-700 border border-green-300">
-            Profile saved successfully!
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Full Name */}
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-1">
               Full Name
@@ -46,13 +54,11 @@ const Profile = () => {
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
-              placeholder="Enter full name"
-              className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full rounded-lg border px-4 py-2"
               required
             />
           </div>
 
-          {/* Alternate Phone */}
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-1">
               Alternate Phone
@@ -62,12 +68,10 @@ const Profile = () => {
               name="alternatePhone"
               value={formData.alternatePhone}
               onChange={handleChange}
-              placeholder="9123456789"
-              className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full rounded-lg border px-4 py-2"
             />
           </div>
 
-          {/* Alternate Email */}
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-1">
               Alternate Email
@@ -77,12 +81,10 @@ const Profile = () => {
               name="alternateEmail"
               value={formData.alternateEmail}
               onChange={handleChange}
-              placeholder="alt@gmail.com"
-              className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full rounded-lg border px-4 py-2"
             />
           </div>
 
-          {/* Gender */}
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-1">
               Gender
@@ -91,7 +93,7 @@ const Profile = () => {
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full rounded-lg border px-4 py-2"
               required
             >
               <option value="">Select Gender</option>
@@ -101,7 +103,6 @@ const Profile = () => {
             </select>
           </div>
 
-          {/* Date of Birth */}
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-1">
               Date of Birth
@@ -111,38 +112,21 @@ const Profile = () => {
               name="dob"
               value={formData.dob}
               onChange={handleChange}
-              className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full rounded-lg border px-4 py-2"
               required
             />
           </div>
 
-          {/* Submit Button */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 flex justify-end mt-4">
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="px-8 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700"
             >
-              Save Profile
+              Save & Next →
             </button>
           </div>
         </form>
       </div>
-
-      {/* Preview Section */}
-      {submitted && (
-        <div className="mt-8 bg-gray-50 rounded-xl shadow p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">
-            Profile Preview
-          </h2>
-          <ul className="space-y-2 text-gray-700">
-            <li><strong>Full Name:</strong> {formData.fullName}</li>
-            <li><strong>Alternate Phone:</strong> {formData.alternatePhone}</li>
-            <li><strong>Alternate Email:</strong> {formData.alternateEmail}</li>
-            <li><strong>Gender:</strong> {formData.gender}</li>
-            <li><strong>Date of Birth:</strong> {formData.dob}</li>
-          </ul>
-        </div>
-      )}
     </div>
   );
 };

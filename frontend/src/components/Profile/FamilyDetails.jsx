@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { saveFamilyProfile } from "../../redux/slices/studentSlice";
+import { nextStep } from "../../redux/slices/admissionSlice";
 
 
 const FamilyDetails = () => {
@@ -19,12 +20,12 @@ const FamilyDetails = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const res = await dispatch(saveFamilyProfile(formData));
-    if (res.meta.requestStatus === "fulfilled") {
-      navigate("/student/profile/bank"); // next step
-    }
-  };
+  e.preventDefault();
+  const res = await dispatch(saveFamilyProfile(formData));
+  if (res.meta.requestStatus === "fulfilled") {
+    dispatch(nextStep()); // ✅ correct
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#C7C5F4] via-[#9F9BD8] to-[#776BCC]">

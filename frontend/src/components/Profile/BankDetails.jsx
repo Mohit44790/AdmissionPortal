@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { saveBankProfile } from "../../redux/slices/studentProfile";
+import { saveBankProfile } from "../../redux/slices/studentSlice";
+import { nextStep } from "../../redux/slices/admissionSlice";
+
 
 const BankDetails = () => {
   const dispatch = useDispatch();
@@ -20,9 +22,9 @@ const BankDetails = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const res = await dispatch(saveBankProfile(formData));
-    if (res.meta.requestStatus === "fulfilled") {
-      navigate("/student/profile/category"); // next step
-    }
+   if (res.meta.requestStatus === "fulfilled") {
+       dispatch(nextStep()); // ✅ correct
+     }
   };
 
   return (

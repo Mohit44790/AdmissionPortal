@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { saveCategoryProfile } from "../../redux/slices/studentSlice";
+import { nextStep } from "../../redux/slices/admissionSlice";
 
 
 const CategoryDetails = () => {
@@ -22,8 +23,8 @@ const CategoryDetails = () => {
     e.preventDefault();
     const res = await dispatch(saveCategoryProfile(formData));
     if (res.meta.requestStatus === "fulfilled") {
-      navigate("/student/profile/other"); // next step
-    }
+        dispatch(nextStep()); // ✅ correct
+      }
   };
 
   return (

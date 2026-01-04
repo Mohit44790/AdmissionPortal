@@ -109,6 +109,17 @@ const Login = () => {
               <i className="fas fa-chevron-right ml-auto text-2xl text-[#7875B5]" />
             </button>
           </form>
+          {/* Register Link */}
+<p className="text-center text-sm text-purple-400 font-bold mt-6">
+  Don’t have an account?{" "}
+  <span
+    onClick={() => navigate("/")}
+    className="font-semibold text-white cursor-pointer hover:underline"
+  >
+    Register here
+  </span>
+</p>
+
 
           {/* Social Login */}
           <div className="absolute bottom-6 right-6 text-white text-center">
