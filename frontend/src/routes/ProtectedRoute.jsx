@@ -1,8 +1,13 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = () => {
-  const token = sessionStorage.getItem("token");
-  return token ? <Outlet /> : <Navigate to="/login" replace />;
+const ProtectedRoute = ({ children }) => {
+  const token = sessionStorage.getItem("token"); // or redux auth state
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children; // ✅ THIS IS THE FIX
 };
 
 export default ProtectedRoute;
