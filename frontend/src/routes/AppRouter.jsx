@@ -7,23 +7,23 @@ import ProtectedRoute from "./ProtectedRoute";
 import Dashboard from "../pages/Dashboard";
 import Profile from "../components/Profile/Profile";
 
-
 const AppRouter = createBrowserRouter([
-    { index: true, element: <Register /> },
-    { path: "verify-otp", element: <VerifyOtp /> },
-    { path: "login", element: <Login /> },
+  { index: true, element: <Register /> },
+  { path: "verify-otp", element: <VerifyOtp /> },
+  { path: "login", element: <Login /> },
+
   {
     path: "/",
-    element: <ProtectedRoute />,
-    element: <Layout />,
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
     children: [
       { path: "dashboard", element: <Dashboard /> },
       { path: "profile", element: <Profile /> },
-      // { path: "admission", element: <AdmissionForm /> },
-      // { path: "payment", element: <Payment /> },
     ],
   },
-   
 ]);
 
 export default AppRouter;
