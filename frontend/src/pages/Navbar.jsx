@@ -1,17 +1,31 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
-import { useSelector } from "react-redux";
-// import dseu_logo from "../assets/logo/dseu_logo.png";
-// import placeholder from "../assets/logo/placeholder-pfp.jpg";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDocuments, viewDocument } from "../redux/slices/admissionDocumentSlice";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
- const { documents } = useSelector((s) => s.admissionDocument);
+  const { documents, viewing } = useSelector((s) => s.admissionDocument);
 
+  // Fetch documents on load
+  useEffect(() => {
+    dispatch(fetchDocuments());
+  }, [dispatch]);
+
+  // Fetch profile photo blob when documents load
+  const photoDoc = documents
+    ?.filter(d => d.documentType === "PHOTO")
+    ?.sort((a, b) => b.id - a.id)[0];
+
+  useEffect(() => {
+    if (photoDoc) {
+      dispatch(viewDocument(photoDoc.id));
+    }
+  }, [photoDoc, dispatch]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -20,23 +34,15 @@ const Navbar = () => {
         setIsDropdownOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  
- const handleLogoClick = () => {
-  navigate("/dashboard");
-};
+  const handleLogoClick = () => navigate("/dashboard");
 
-  // -------------------------------
-  // Logout
-  // -------------------------------
   const handleLogout = () => {
     sessionStorage.clear();
     navigate("/login");
-   
   };
 
   return (
@@ -45,10 +51,14 @@ const Navbar = () => {
         
         {/* Logo */}
         <div
-          className="flex items-center gap-2  cursor-pointer hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
           onClick={handleLogoClick}
         >
-          <img src="https://dseuadm.samarth.edu.in/assets/759660c7/site_files/dseu_logo.png" alt="DSEU Logo" className="h-12" />
+          <img
+            src="https://dseuadm.samarth.edu.in/assets/759660c7/site_files/dseu_logo.png"
+            alt="DSEU Logo"
+            className="h-12"
+          />
         </div>
 
         {/* Right Icons */}
@@ -57,63 +67,47 @@ const Navbar = () => {
           {/* User Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
-  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-  className="flex items-center gap-2 p-1.5  rounded-full transition-colors cursor-pointer"
->
-  {/* GRADIENT RING */}
-  <div className="relative">
-  <div className="p-0.5 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600">
-    <div className="bg-white rounded-full p-0.5 ">
-    <img
-  src={
-    documents.find(d => d.documentType === "PHOTO")
-      ? `/student/admission/view-document/${
-          documents.find(d => d.documentType === "PHOTO").id
-        }`
-      : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw7Ruc3aDfDuCbY_FFQ-23U1on7qndeh-dNw&s"
-  }
-  className="h-12"
-/>
-
-    </div>
-  </div>
-</div>
-
-</button>
-
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 p-1.5 rounded-full transition-colors cursor-pointer"
+            >
+              {/* Gradient Ring */}
+              <div className="relative">
+                <div className="p-0.5 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600">
+                  <div className="bg-white rounded-full p-0.5">
+                    <img
+                      src={
+                        viewing || 
+                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw7Ruc3aDfDuCbY_FFQ-23U1on7qndeh-dNw&s"
+                      }
+                      alt="Profile"
+                      className="w-10 h-10 rounded-full object-contain"
+                    />
+                  </div>
+                </div>
+              </div>
+            </button>
 
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-100">
-
-               
-
-                {/* Menu Items */}
                 <div className="py-1">
                   <button
-                    onClick={() => {
-                      navigate("/profile");
-                      setIsDropdownOpen(false);
-                    }}
+                    onClick={() => { navigate("/profile"); setIsDropdownOpen(false); }}
                     className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                   >
                     <FaUser className="w-4 h-4 text-gray-400" />
                     Profile Info
                   </button>
-
                   <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsDropdownOpen(false);
-                    }}
+                    onClick={() => { handleLogout(); setIsDropdownOpen(false); }}
                     className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                   >
                     <FaSignOutAlt className="w-4 h-4" />
                     Logout
                   </button>
                 </div>
-
               </div>
             )}
+
           </div>
         </div>
 
