@@ -89,12 +89,12 @@ const OtherDetails = () => {
             className={`w-full bg-white text-[#4C489D] font-bold py-3 rounded-full shadow transition
               ${loading ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02]"}`}
           >
-            {loading ? "Submitting..." : "Submit Admission"}
+            {loading ? "Submitting..." : "Save and Continue"}
           </button>
         </form>
 
         <p className="text-white text-xs text-center mt-6 opacity-80">
-          Step 5 of 5 • Admission Complete
+          Step 5 of 6 • Admission Complete
         </p>
       </div>
     </div>

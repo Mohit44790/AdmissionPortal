@@ -1,10 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchDocuments,
-  viewDocument,
-  clearView,
-} from "../../redux/slices/admissionDocumentSlice";
+import { clearView, fetchDocuments, viewDocument } from "../../../redux/slices/admissionDocumentSlice";
+
 
 const DocumentList = () => {
   const dispatch = useDispatch();

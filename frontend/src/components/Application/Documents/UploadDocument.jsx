@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { uploadDocument } from "../../../redux/slices/admissionDocumentSlice";
+import DocumentList from "./DocumentList";
 
 
 const UploadDocument = () => {
@@ -50,6 +51,7 @@ const UploadDocument = () => {
           {loading ? "Uploading..." : "Upload"}
         </button>
       </form>
+      <DocumentList/>
     </div>
   );
 };
