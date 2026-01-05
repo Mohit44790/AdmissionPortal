@@ -52,6 +52,7 @@ public class StudentProfileService {
     public List<StudentDocument> getDocuments(StudentProfile profile) {
         return docRepo.findByStudentProfile(profile);
     }
+
 }
 
 

@@ -2,10 +2,7 @@ package com.mohit44790.admission.controller;
 
 import com.mohit44790.admission.dto.common.ApiResponse;
 import com.mohit44790.admission.dto.student.*;
-import com.mohit44790.admission.entity.Course;
-import com.mohit44790.admission.entity.Payment;
-import com.mohit44790.admission.entity.StudentProfile;
-import com.mohit44790.admission.entity.User;
+import com.mohit44790.admission.entity.*;
 import com.mohit44790.admission.repository.CourseRepository;
 import com.mohit44790.admission.repository.PaymentRepository;
 import com.mohit44790.admission.repository.UserRepository;
@@ -51,11 +48,12 @@ public class StudentProfileController {
 
         User user = userRepo.findByEmail(principal.getName()).orElseThrow();
         StudentProfile profile = service.getOrCreate(user);
-
+        List<StudentDocument> documents = service.getDocuments(profile);
         StudentProfileResponse res = new StudentProfileResponse();
         res.setEmail(user.getEmail());
         res.setMobile(user.getMobile());
         res.setProfile(profile);
+        res.setDocuments(documents);
 
         return res;
     }
