@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
+import { useSelector } from "react-redux";
 // import dseu_logo from "../assets/logo/dseu_logo.png";
 // import placeholder from "../assets/logo/placeholder-pfp.jpg";
 
@@ -9,6 +10,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+ const { documents } = useSelector((s) => s.admissionDocument);
+
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -61,11 +64,17 @@ const Navbar = () => {
   <div className="relative">
   <div className="p-0.5 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600">
     <div className="bg-white rounded-full p-0.5 ">
-      <img
-        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw7Ruc3aDfDuCbY_FFQ-23U1on7qndeh-dNw&s"
-        alt="Profile"
-        className="w-10 h-10 rounded-full object-cover"
-      />
+    <img
+  src={
+    documents.find(d => d.documentType === "PHOTO")
+      ? `/student/admission/view-document/${
+          documents.find(d => d.documentType === "PHOTO").id
+        }`
+      : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw7Ruc3aDfDuCbY_FFQ-23U1on7qndeh-dNw&s"
+  }
+  className="h-12"
+/>
+
     </div>
   </div>
 </div>

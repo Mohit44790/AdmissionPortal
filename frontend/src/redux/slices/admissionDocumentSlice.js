@@ -53,14 +53,15 @@ export const viewDocument = createAsyncThunk(
         `/student/admission/view-document/${id}`,
         { responseType: "blob" }
       );
-      return { blob: res.data, id };
+
+      const url = URL.createObjectURL(res.data); // ✅ serializable string
+      return url;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "Failed to view document"
-      );
+      return rejectWithValue("Failed to view document");
     }
   }
 );
+
 
 /* ================= SLICE ================= */
 const admissionDocumentSlice = createSlice({
@@ -106,9 +107,9 @@ const admissionDocumentSlice = createSlice({
       })
 
       // VIEW
-      .addCase(viewDocument.fulfilled, (s, a) => {
-        s.viewing = URL.createObjectURL(a.payload.blob);
-      });
+      .addCase(viewDocument.fulfilled, (state, action) => {
+  state.viewing = action.payload; // string URL
+})
   },
 });
 
