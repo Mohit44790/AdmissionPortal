@@ -9,6 +9,7 @@ import CategoryDetails from "../../Profile/CategoryDetails";
 import OtherDetails from "../../Profile/OtherDetails";
 import { fetchStudentProfile } from "../../../redux/slices/studentSlice";
 import { useEffect } from "react";
+import UploadDocument from "../Documents/UploadDocument";
 
 const AdmissionForm = () => {
   const { step } = useSelector((s) => s.admission);
@@ -31,6 +32,8 @@ const AdmissionForm = () => {
         return <CategoryDetails />;
       case 5:
         return <OtherDetails />;
+      case 6:
+        return <UploadDocument />;
       default:
         return null;
     }
@@ -53,11 +56,11 @@ const AdmissionForm = () => {
           </button>
 
           <button
-            disabled={step === 5}
+            disabled={step === 6}
             onClick={() => dispatch(nextStep())}
             className="px-6 py-2 rounded bg-indigo-600 text-white disabled:opacity-50"
           >
-            {step === 5 ? "Finish" : "Next"}
+            {step === 6 ? "Finish" : "Next"}
           </button>
         </div>
       </div>

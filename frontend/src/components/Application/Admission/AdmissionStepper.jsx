@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { TOTAL_STEPS } from "../../../redux/slices/admissionSlice";
 
-const steps = ["Personal", "Family", "Bank", "Category", "Other"];
+const steps = ["Personal", "Family", "Bank", "Category", "Other","Documents"];
 
 const AdmissionStepper = () => {
   const { step } = useSelector((s) => s.admission);
