@@ -7,7 +7,7 @@ const AdmissionStepper = () => {
   const { step } = useSelector((s) => s.admission);
 
   return (
-    <div className="w-full px-6 py-4 bg-white shadow sticky top-0 z-50">
+    <div className="w-full px-6 py-4 bg-white shadow sticky top-0 ">
       <div className="flex items-center max-w-4xl mx-auto">
         {steps.map((label, index) => (
           <div key={label} className="flex-1 flex items-center">
