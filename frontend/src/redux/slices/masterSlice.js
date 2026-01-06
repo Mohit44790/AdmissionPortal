@@ -52,3 +52,46 @@ export const createCourse = createAsyncThunk(
   }
 );
 
+const masterSlice = createSlice({
+  name:"master",
+  initialState:{
+    programs:[],
+    colleges:[],
+    courses:[],
+    loading:false,
+    error:null,
+  },
+  reducers:{},
+  extraReducers:(builder)=>{
+    const pending =(s) =>{
+      s.loading = true;
+      s.error = null;
+    };
+    const rejected =(s,a)=>{
+      s.loading = false;
+      s.error = a.payload;
+    };
+
+    builder
+          .addCase(createProgram.pending,pending)
+          .addCase(createProgram.fulfilled,(s,a) =>{
+            s.loading = false;
+            s.programs.push(a.payload);
+          })
+          .addCase(createProgram.rejected ,rejected)
+
+          .addCase(deleteProgram.fulfilled,(s,a)=>{
+            s.programs = s.programs.filter((p)=>p.id !== a.payload);
+          })
+          .addCase(createCollege.fulfilled,(s,a)=>{
+            s.loading = false;
+            s.colleges.push(a.payload);
+          })
+          .addCase(createCourse.fulfilled,(s,a)=>{
+            s.loading = false;
+            s.courses.push(a.payload);
+          });
+  }
+});
+
+export default masterSlice.reducer;
