@@ -8,6 +8,11 @@ import Dashboard from "../pages/Dashboard";
 import Profile from "../components/Profile/Profile";
 import AdmissionForm from "../components/Application/Admission/AdmissionForm";
 import StudentProfileView from "../components/Profile/StudentProfileView";
+import AdminProtectedRoute from "../pages/Admin/routes/AdminProtectedRoute";
+import AdminLayout from "../pages/Admin/layout/AdminLayout";
+import ProgramMaster from "../pages/Admin/ProgramMaster";
+import CollegeMaster from "../pages/Admin/CollegeMaster";
+import CourseMaster from "../pages/Admin/CourseMaster";
 
 const AppRouter = createBrowserRouter([
   { index: true, element: <Register /> },
@@ -32,6 +37,21 @@ const AppRouter = createBrowserRouter([
   element: <StudentProfileView />,
 }
 
+    ],
+  },
+
+  /* ADMIN ROUTES */
+  {
+    path: "/admin",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout />
+      </AdminProtectedRoute>
+    ),
+    children: [
+      { path: "programs", element: <ProgramMaster /> },
+      { path: "colleges", element: <CollegeMaster /> },
+      { path: "courses", element: <CourseMaster /> },
     ],
   },
 ]);
