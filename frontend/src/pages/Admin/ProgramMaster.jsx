@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createProgram, deleteProgram } from "../../redux/slices/masterSlice";
+import { createProgram, deleteProgram } from "../../redux/slices/adminSlice";
 
 
 const ProgramMaster = () => {
   const [level, setLevel] = useState("");
   const dispatch = useDispatch();
-  const { programs, loading } = useSelector((s) => s.master);
+  const { programs, loading } = useSelector((s) => s.admin);
 
   return (
     <div className="bg-white p-6 rounded-xl shadow">
