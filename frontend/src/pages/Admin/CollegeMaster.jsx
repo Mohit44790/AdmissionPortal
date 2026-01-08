@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
-import { createCollege } from '../../redux/slices/masterSlice';
+import { createCollege } from '../../redux/slices/adminSlice';
 
 const CollegeMaster = () => {
     const [collegeName ,setCollegeName] = useState("");
