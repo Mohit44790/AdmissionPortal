@@ -45,7 +45,7 @@ export const loginUser = createAsyncThunk(
       const res = await api.post("/auth/login", data);
 
       // ✅ Extract from backend response
-      const { token, name, email, mobile } = res.data;
+      const { token, name, email, mobile,role } = res.data;
 
       if (!token) {
         throw new Error("Token not received");
@@ -55,6 +55,7 @@ export const loginUser = createAsyncThunk(
         name,
         email,
         mobile,
+        role
         
       };
 

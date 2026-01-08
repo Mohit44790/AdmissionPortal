@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { fetchStudentProfile } from "../redux/slices/studentSlice";
 
 const Dashboard = () => {
@@ -14,9 +14,17 @@ const Dashboard = () => {
   const currentYear = new Date().getFullYear();
   const nextYear = currentYear + 1;
 
+ /* ✅ ALWAYS RUN HOOKS FIRST */
   useEffect(() => {
-    dispatch(fetchStudentProfile());
-  }, [dispatch]);
+    if (user?.role !== "ADMIN") {
+      dispatch(fetchStudentProfile());
+    }
+  }, [dispatch, user?.role]);
+
+  /* ✅ ADMIN REDIRECT (AFTER HOOKS) */
+  if (user?.role === "ADMIN") {
+    return <Navigate to="/admin/programs" replace />;
+  }
 
   // ⏳ Loading state
   if (loading) {
