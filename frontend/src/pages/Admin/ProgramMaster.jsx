@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createProgram, deleteProgram } from "../../redux/slices/adminSlice";
+import { createProgram, deleteProgram, fetchPrograms } from "../../redux/slices/adminSlice";
 
 
 const ProgramMaster = () => {
   const [level, setLevel] = useState("");
   const dispatch = useDispatch();
   const { programs, loading } = useSelector((s) => s.admin);
+
+  useEffect(() =>{
+    dispatch(fetchPrograms());
+  }, [dispatch]);
+
+  const handleAdd = () =>{
+    if(!level) return;
+    dispatch(createProgram({level}));
+    setLevel("")
+  }
 
   return (
     <div className="bg-white p-6 rounded-xl shadow">
