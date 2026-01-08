@@ -9,9 +9,9 @@ export const fetchPrograms = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await api.get("/api/master/programs");
-      return res.data;
+      return res.data; // 👈 full response
     } catch (e) {
-      return rejectWithValue("Failed to load programs");
+      return rejectWithValue("Failed to fetch programs");
     }
   }
 );
@@ -206,7 +206,7 @@ const adminSlice = createSlice({
       .addCase(fetchPrograms.pending, pending)
       .addCase(fetchPrograms.fulfilled, (s, a) => {
         s.loading = false;
-        s.programs = a.payload;
+        s.programs = a.payload.data;
       })
       .addCase(createProgram.fulfilled, (s, a) => {
         s.loading = false;
@@ -226,7 +226,7 @@ const adminSlice = createSlice({
       .addCase(fetchColleges.pending, pending)
       .addCase(fetchColleges.fulfilled, (s, a) => {
         s.loading = false;
-        s.colleges = a.payload;
+        s.colleges = a.payload.data;
       })
       .addCase(createCollege.fulfilled, (s, a) => {
         s.loading = false;
