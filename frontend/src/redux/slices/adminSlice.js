@@ -52,8 +52,8 @@ export const createCourse = createAsyncThunk(
   }
 );
 
-const masterSlice = createSlice({
-  name:"master",
+const adminSlice = createSlice({
+  name:"admin",
   initialState:{
     programs:[],
     colleges:[],
@@ -94,4 +94,4 @@ const masterSlice = createSlice({
   }
 });
 
-export default masterSlice.reducer;
+export default adminSlice.reducer;

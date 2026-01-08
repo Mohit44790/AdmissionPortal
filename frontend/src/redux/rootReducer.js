@@ -3,7 +3,7 @@ import authReducer from "./slices/authSlice";
 import studentProfileReducer from "./slices/studentSlice";
 import admissionReducer from "./slices/admissionSlice";
 import admissionDocumentReducer from "./slices/admissionDocumentSlice";
-import masterReducer from "./slices/masterSlice";
+import adminReducer from "./slices/adminSlice";
 
 // Combine reducers
 const rootReducer = combineReducers({
@@ -11,7 +11,7 @@ const rootReducer = combineReducers({
   studentProfile: studentProfileReducer,
   admission: admissionReducer,
   admissionDocument: admissionDocumentReducer,
-   master: masterReducer,
+   admin: adminReducer,
  
  
 });
