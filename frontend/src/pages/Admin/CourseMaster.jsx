@@ -8,7 +8,9 @@ import {
 
 const CourseMaster = () => {
   const dispatch = useDispatch();
-  const { programs, colleges, loading } = useSelector((s) => s.admin);
+  const { programs = [], colleges = [], loading } = useSelector(
+    (s) => s.admin
+  );
 
   const [courseName, setCourseName] = useState("");
   const [programId, setProgramId] = useState("");
@@ -24,7 +26,7 @@ const CourseMaster = () => {
 
     dispatch(
       createCourse({
-        courseName,
+        courseName: courseName.trim(),
         program: { id: Number(programId) },
         college: { id: Number(collegeId) },
       })
@@ -36,7 +38,7 @@ const CourseMaster = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow">
+    <div className="max-w-xl bg-white p-6 rounded-xl shadow">
       <h2 className="text-xl font-bold mb-4">Course Master</h2>
 
       <input
@@ -46,7 +48,6 @@ const CourseMaster = () => {
         className="border px-3 py-2 rounded w-full mb-3"
       />
 
-      {/* PROGRAM DROPDOWN */}
       <select
         value={programId}
         onChange={(e) => setProgramId(e.target.value)}
@@ -60,11 +61,10 @@ const CourseMaster = () => {
         ))}
       </select>
 
-      {/* COLLEGE DROPDOWN */}
       <select
         value={collegeId}
         onChange={(e) => setCollegeId(e.target.value)}
-        className="border px-3 py-2 rounded w-full mb-3"
+        className="border px-3 py-2 rounded w-full mb-4"
       >
         <option value="">Select College</option>
         {colleges.map((c) => (
@@ -77,7 +77,7 @@ const CourseMaster = () => {
       <button
         onClick={handleSave}
         disabled={loading}
-        className="bg-blue-600 text-white px-6 py-2 rounded w-full"
+        className="bg-blue-600 text-white px-6 py-2 rounded w-full disabled:opacity-60"
       >
         {loading ? "Saving..." : "Save Course"}
       </button>
